@@ -6,4 +6,5 @@
   
 作ったものリスト
 ---------------------------------  
-###### H6・2048  ![Alt text](/InspectorGame/ExampleImage/Example_2048.gif)
+###### H6・2048  
+![Alt text](/InspectorGame/ExampleImage/Example_2048.gif)
