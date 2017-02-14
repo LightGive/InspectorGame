@@ -11,7 +11,13 @@ public class Game2048 : MonoBehaviour
 	[ContextMenu("Delete SaveData")]
 	void DeleteSaveData()
 	{
-		EditorPrefs.DeleteKey(Game1024Editor.SAVE_SCORE_KEY);
+		for (int i = Game1024Editor.MIN_MASS; i < Game1024Editor.MAX_MASS; i++)
+		{
+			for (int j = Game1024Editor.MIN_MASS; j < Game1024Editor.MAX_MASS; j++)
+			{
+				EditorPrefs.DeleteKey(Game1024Editor.SAVE_SCORE_KEY + i.ToString("00") + j.ToString("00"));
+			}
+		}
 	}
 }
 
@@ -20,6 +26,8 @@ public class Game2048 : MonoBehaviour
 public class Game1024Editor : Editor
 {
 	public const string SAVE_SCORE_KEY = "SAVE_SCORE_KEY";
+	public const int MAX_MASS = 10;
+	public const int MIN_MASS = 2;
 	private const int DEFAULT_WIDTH_NUM = 4;
 	private const int BUTTON_HEIGHT = 20;
 	private const int MASS_HEIGHT = 20;
@@ -34,7 +42,7 @@ public class Game1024Editor : Editor
 			if (value > highScore)
 			{
 				highScore = value;
-				EditorPrefs.SetInt(SAVE_SCORE_KEY, highScore);
+				EditorPrefs.SetInt(SAVE_SCORE_KEY + row.ToString("00") + colum.ToString("00"), highScore);
 			}
 			score = value;
 		}
@@ -61,8 +69,8 @@ public class Game1024Editor : Editor
 	{
 		if (!isStart)
 		{
-			row = (int)EditorGUILayout.IntSlider("Row",row, 2, 10);
-			colum = (int)EditorGUILayout.IntSlider("Colum",colum, 2, 10);
+			row = (int)EditorGUILayout.IntSlider("Row", row, MIN_MASS, MAX_MASS);
+			colum = (int)EditorGUILayout.IntSlider("Colum", colum, MIN_MASS, MAX_MASS);
 			if (GUILayout.Button("Start"))
 			{
 				isStart = true;
@@ -163,7 +171,7 @@ public class Game1024Editor : Editor
 	void Reset(int _row, int _colum)
 	{
 		Score = 0;
-		highScore = EditorPrefs.GetInt(SAVE_SCORE_KEY, 0);
+		highScore = EditorPrefs.GetInt(SAVE_SCORE_KEY + _row.ToString("00") + _colum.ToString("00"), 0);
 		mass = new int[_row, _colum];
 		for (int i = 0; i < row; i++)
 		{
