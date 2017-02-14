@@ -12,6 +12,10 @@ public class GameTetoris : MonoBehaviour{ }
 [CustomEditor(typeof(GameTetoris))]
 public class GameTetorisEditor : Editor
 {
+	private const int WID_NUM = 10;
+	private const int HEI_NUM = 20;
+
+	private int[,] mass = new int[WID_NUM, HEI_NUM];
 	private float deltaTime;
 	private float prevTime;
 	private float pos;
@@ -19,11 +23,25 @@ public class GameTetorisEditor : Editor
 	public override void OnInspectorGUI()
 	{
 		CalcDeltaTime();
-		GUILayout.Box("a", GUILayout.Width(pos));
-		pos += deltaTime;
-		if (pos > 400)
-			pos = 0;
 		Repaint();
+	}
+	
+	void Init()
+	{
+
+	}
+
+	void DisplayMass()
+	{
+		var windowWidth = EditorGUIUtility.currentViewWidth;
+
+		for (int i = 0; i < WID_NUM; i++)
+		{
+			for (int j = 0; j < HEI_NUM; j++)
+			{
+				mass[i, j] = 0;
+			}
+		}
 	}
 
 	void CalcDeltaTime()
