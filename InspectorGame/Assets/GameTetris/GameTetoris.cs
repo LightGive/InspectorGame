@@ -16,7 +16,7 @@ public class GameTetorisEditor : Editor
 	private const int WID_NUM = 10;
 	private const int HEI_NUM = 20;
 	private const int MYMASS_NUM = 4;
-	private const float INTERVAL = 0.5f;
+	private const float INTERVAL = 1000.5f;
 
 	private int[,] mass = new int[HEI_NUM, WID_NUM];
 	private int[,] myMass = new int[MYMASS_NUM, MYMASS_NUM];
@@ -43,8 +43,9 @@ public class GameTetorisEditor : Editor
 			}
 			return;
 		}
-		DisplayMass();
 		CalcDeltaTime();
+		TimeCount();
+		DisplayMass();
 		Repaint();
 	}
 	
@@ -103,20 +104,29 @@ public class GameTetorisEditor : Editor
 
 	void TimeCount()
 	{
-		timeCnt += Time.deltaTime;
+		timeCnt += deltaTime;
 		if (timeCnt > GetInterval())
 		{
 			timeCnt = 0.0f;
+			Fall();
 		}
 	}
 
 	void Fall()
 	{
-		for (int i = 0; i < HEI_NUM; i++)
+		for (int i = HEI_NUM-1; i >=0; i--)
 		{
 			for (int j = 0; j < WID_NUM; j++)
 			{
-				mass[i, j] = 0;
+				if (mass[i, j] == 0)
+					continue;
+
+				if (i + 1 >= HEI_NUM)
+					continue;
+
+				var tmp = mass[i + 1, j];
+				mass[i + 1, j] = mass[i, j];
+				mass[i, j] = tmp;
 			}
 		}
 	}
