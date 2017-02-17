@@ -7,4 +7,6 @@
 作ったものリスト
 ---------------------------------  
 ####・2048  
-![Alt text](/InspectorGame/ExampleImage/Example_2048.gif)
+![Alt text](/InspectorGame/ExampleImage/Example_2048.gif)  
+  
+  作ってほしい要望などあれば教えてください
