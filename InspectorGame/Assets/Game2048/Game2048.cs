@@ -26,9 +26,12 @@ public class Game2048 : MonoBehaviour
 public class Game1024Editor : Editor
 {
 	public const string SAVE_SCORE_KEY = "SAVE_SCORE_KEY";
-	public const int MAX_MASS = 10;
+	public const string SAVE_MASS_KEY = "SAVE_MASS_KEY";
+    public const int MAX_MASS = 10;
 	public const int MIN_MASS = 2;
-	private const int DEFAULT_WIDTH_NUM = 4;
+	private const int MAX_NUM = 524288;
+	private const int DIGIT_NUM = 6;
+    private const int DEFAULT_WIDTH_NUM = 4;
 	private const int BUTTON_HEIGHT = 20;
 	private const int MASS_HEIGHT = 20;
 	private const float TOW_PERCENET = 0.75f;
@@ -109,18 +112,14 @@ public class Game1024Editor : Editor
 			}
 			EditorGUILayout.EndHorizontal();
 		}
-
 		GUI.color = Color.white;
-
 		EditorGUILayout.Space();
-
 		EditorGUI.BeginDisabledGroup(IsCanNotMove(1, 0));
 		if (GUILayout.Button("Up", GUILayout.Height(BUTTON_HEIGHT)))
 		{
 			MoveUnit(1, 0);
 		}
 		EditorGUI.EndDisabledGroup();
-
 		EditorGUILayout.BeginHorizontal();
 		EditorGUI.BeginDisabledGroup(IsCanNotMove(0, 1));
 		if (GUILayout.Button("Left", GUILayout.Height(BUTTON_HEIGHT)))
@@ -128,14 +127,12 @@ public class Game1024Editor : Editor
 			MoveUnit(0, 1);
 		}
 		EditorGUI.EndDisabledGroup();
-
 		EditorGUI.BeginDisabledGroup(IsCanNotMove(0, -1));
 		if (GUILayout.Button("Right", GUILayout.Height(BUTTON_HEIGHT)))
 		{
 			MoveUnit(0, -1);
 		}
 		EditorGUI.EndDisabledGroup();
-
 		EditorGUILayout.EndHorizontal();
 		EditorGUI.BeginDisabledGroup(IsCanNotMove(-1, 0));
 		if (GUILayout.Button("Down", GUILayout.Height(BUTTON_HEIGHT)))
@@ -143,11 +140,8 @@ public class Game1024Editor : Editor
 			MoveUnit(-1, 0);
 		}
 		EditorGUI.EndDisabledGroup();
-
 		EditorGUILayout.Space();
-
-		//menue
-
+		
 		return;
 		EditorGUILayout.BeginHorizontal();
 		if (GUILayout.Button("Quit", GUILayout.Height(BUTTON_HEIGHT)))
@@ -170,6 +164,9 @@ public class Game1024Editor : Editor
 
 	void Reset(int _row, int _colum)
 	{
+		var str = "あいうえお";
+		Debug.Log(str.Substring(0,6));
+
 		Score = 0;
 		highScore = EditorPrefs.GetInt(SAVE_SCORE_KEY + _row.ToString("00") + _colum.ToString("00"), 0);
 		mass = new int[_row, _colum];
@@ -181,6 +178,39 @@ public class Game1024Editor : Editor
 			}
 		}
 		Pop();
+	}
+
+	void SaveMass(int _row, int _colum)
+	{
+		var saveStr = "";
+
+		saveStr += _row.ToString("000000");
+		saveStr += _colum.ToString("000000");
+		for (int i = 0; i < row; i++)
+		{
+			for (int j = 0; j < colum; j++)
+			{
+				saveStr += mass[i, j].ToString("000000");
+				mass[i, j] = 0;
+			}
+		}
+		EditorPrefs.SetString(SAVE_MASS_KEY, saveStr);
+	}
+
+	int[] LoadMass()
+	{
+		var loadStr = EditorPrefs.GetString(SAVE_MASS_KEY, "");
+		int row = int.Parse(loadStr.Substring(0, DIGIT_NUM));
+		int colum = int.Parse(loadStr.Substring(DIGIT_NUM, DIGIT_NUM));
+
+		int[,] loadMass = new int[row, colum];
+		for(int i = DIGIT_NUM * 2; i < (DIGIT_NUM * 2) + row; i += DIGIT_NUM)
+		{
+			for (int j = DIGIT_NUM * 2; j < (DIGIT_NUM * 2) + colum; j  += DIGIT_NUM)
+			{
+
+			}
+		}
 	}
 
 	Color GetNumColor(int _num)
@@ -223,8 +253,12 @@ public class Game1024Editor : Editor
 		var num = Random.value > TOW_PERCENET ? 4 : 2;
 		mass[zeroIdxList[ran].x, zeroIdxList[ran].y] = num;
 
+
 		if (IsCanNotMove(1, 0) && IsCanNotMove(0, 1) && IsCanNotMove(-1, 0) && IsCanNotMove(0, -1))
+		{
+			OnInspectorGUI();
 			GameOver();
+		}
 	}
 
 	void GameOver()
@@ -293,7 +327,7 @@ public class Game1024Editor : Editor
 					{
 						if (k == 1)
 						{
-							var addScore = mass[i, j] * 2;
+							var addScore = (mass[i, j] == MAX_NUM) ? mass[i, j] : mass[i, j] * 2;
 							mass[i, j] = addScore;
 							Score += addScore;
 						}
@@ -326,7 +360,5 @@ public class Game1024Editor : Editor
 		}
 		Pop();
 	}
-
-
 }
 #endif
