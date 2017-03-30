@@ -142,7 +142,6 @@ public class Game1024Editor : Editor
 		EditorGUI.EndDisabledGroup();
 		EditorGUILayout.Space();
 		
-		return;
 		EditorGUILayout.BeginHorizontal();
 		if (GUILayout.Button("Quit", GUILayout.Height(BUTTON_HEIGHT)))
 		{
@@ -150,6 +149,7 @@ public class Game1024Editor : Editor
 		}
 		if (GUILayout.Button("Save", GUILayout.Height(BUTTON_HEIGHT)))
 		{
+			SaveMass();
 		}
 		if (GUILayout.Button("Load", GUILayout.Height(BUTTON_HEIGHT)))
 		{
@@ -165,7 +165,7 @@ public class Game1024Editor : Editor
 	void Reset(int _row, int _colum)
 	{
 		var str = "あいうえお";
-		Debug.Log(str.Substring(0,6));
+		Debug.Log(str.Substring(0,1));
 
 		Score = 0;
 		highScore = EditorPrefs.GetInt(SAVE_SCORE_KEY + _row.ToString("00") + _colum.ToString("00"), 0);
@@ -180,12 +180,12 @@ public class Game1024Editor : Editor
 		Pop();
 	}
 
-	void SaveMass(int _row, int _colum)
+	void SaveMass()
 	{
 		var saveStr = "";
 
-		saveStr += _row.ToString("000000");
-		saveStr += _colum.ToString("000000");
+		saveStr += row.ToString("000000");
+		saveStr += colum.ToString("000000");
 		for (int i = 0; i < row; i++)
 		{
 			for (int j = 0; j < colum; j++)
@@ -197,7 +197,7 @@ public class Game1024Editor : Editor
 		EditorPrefs.SetString(SAVE_MASS_KEY, saveStr);
 	}
 
-	int[] LoadMass()
+	int[,] LoadMass()
 	{
 		var loadStr = EditorPrefs.GetString(SAVE_MASS_KEY, "");
 		int row = int.Parse(loadStr.Substring(0, DIGIT_NUM));
@@ -211,6 +211,7 @@ public class Game1024Editor : Editor
 
 			}
 		}
+		return loadMass;
 	}
 
 	Color GetNumColor(int _num)
