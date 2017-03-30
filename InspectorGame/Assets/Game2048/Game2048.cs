@@ -153,6 +153,7 @@ public class Game1024Editor : Editor
 		}
 		if (GUILayout.Button("Load", GUILayout.Height(BUTTON_HEIGHT)))
 		{
+			mass = LoadMass();
 		}
 		if (GUILayout.Button("Reset", GUILayout.Height(BUTTON_HEIGHT)))
 		{
@@ -194,6 +195,7 @@ public class Game1024Editor : Editor
 				mass[i, j] = 0;
 			}
 		}
+		Debug.Log(saveStr);
 		EditorPrefs.SetString(SAVE_MASS_KEY, saveStr);
 	}
 
@@ -208,7 +210,7 @@ public class Game1024Editor : Editor
 		{
 			for (int j = DIGIT_NUM * 2; j < (DIGIT_NUM * 2) + colum; j  += DIGIT_NUM)
 			{
-
+				//loadMass[] loadStr
 			}
 		}
 		return loadMass;
