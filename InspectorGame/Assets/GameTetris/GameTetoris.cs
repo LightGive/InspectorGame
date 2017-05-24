@@ -15,16 +15,30 @@ public class GameTetorisEditor : Editor
 	private const int WALL_NUM = 2;
 	private const int WID_NUM = 10;
 	private const int HEI_NUM = 20;
-	private const int MYMASS_NUM = 4;
+	private const int BLOCK_TYPE = 1;
+	private const int BLOCK_SPACE = 4;
+
 	private const float INTERVAL = 1000.5f;
 
 	private int[,] mass = new int[HEI_NUM, WID_NUM];
-	private int[,] myMass = new int[MYMASS_NUM, MYMASS_NUM];
+
+	private int[,] myblockPos = new int[3, 0];
+	private int[,] myBlock = new int[BLOCK_SPACE, BLOCK_SPACE];
 	private bool isStart = false;
 	private float deltaTime;
 	private float prevTime;
 	private float pos;
 	private float timeCnt;
+
+	private int[,,] massList = new int[BLOCK_TYPE, BLOCK_SPACE, BLOCK_SPACE]
+	{
+		{
+			{1,1,1,1 },
+			{1,1,1,1 },
+			{1,1,1,1 },
+			{1,1,1,1 }
+		},
+	};
 
 	public enum BlockInfo
 	{
@@ -62,6 +76,7 @@ public class GameTetorisEditor : Editor
 		}
 
 		mass[0, 5] = 1;
+
 	}
 
 	void DisplayMass()
@@ -93,6 +108,20 @@ public class GameTetorisEditor : Editor
 		}
 
 		return Color.white;
+	}
+
+	void InstantiateBlock()
+	{
+		int blockNo = Random.Range(0, BLOCK_TYPE);
+		myBlock = new int[BLOCK_SPACE, BLOCK_SPACE];
+
+		for(int i = 0; i < BLOCK_SPACE; i++)
+		{
+			for (int j = 0; j < BLOCK_SPACE; j++)
+			{
+				myBlock[i, j] = massList[blockNo, i, j];
+			}
+		}
 	}
 
 	void CalcDeltaTime()
