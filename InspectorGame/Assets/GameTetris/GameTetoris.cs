@@ -25,6 +25,7 @@ public class GameTetorisEditor : Editor
 	private int[,] myBlock = new int[BLOCK_SPACE, BLOCK_SPACE];
 	private int myblockPosX = 0;
 	private int myblockPosY = 0;
+	private int score;
 	private bool isStart = false;
 	private bool isGameOver = false;
 	private float deltaTime;
@@ -76,7 +77,7 @@ public class GameTetorisEditor : Editor
 	void Init()
 	{
 		isStart = true;
-
+		
 		mass = new int[,]
 		{
 			{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -260,9 +261,9 @@ public class GameTetorisEditor : Editor
 	{
 		switch (_massNum)
 		{
-			case -1: return Color.gray;
+			case -1: return new Color(0.4f, 0.4f, 0.4f, 1.0f);
 			case 0:  return Color.white;
-			case 1:  return Color.gray;
+			case 1:  return new Color(0.5f, 0.5f, 0.5f, 1.0f);
 			case 2:  return Color.red;
 			case 3:  return Color.green;
 			case 4:  return Color.yellow;
