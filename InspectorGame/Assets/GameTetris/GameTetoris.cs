@@ -80,7 +80,7 @@ public class GameTetorisEditor : Editor
 			}
 		}
 
-		mass[0, 5] = 1;
+		//mass[0, 5] = 1;
 
 	}
 
@@ -94,7 +94,18 @@ public class GameTetorisEditor : Editor
 			EditorGUILayout.BeginHorizontal();
 			for (int j = 0; j < WID_NUM; j++)
 			{
-				GUI.color = GetColor(mass[i, j]);
+				if (myblockPosX <= j && (myblockPosX + 3) >= j && myblockPosY <= i && (myblockPosY + 3) >= i)
+				{
+					var diffX = j - myblockPosX;
+					var diffY = i - myblockPosY;
+					GUI.color = GetColor(myBlock[diffX, diffY]);
+				}
+				else
+				{
+					GUI.color = GetColor(mass[i, j]);
+
+				}
+
 				GUILayout.Box("", GUILayout.Width(w), GUILayout.Height(w));
 			}
 			EditorGUILayout.EndHorizontal();
@@ -148,21 +159,7 @@ public class GameTetorisEditor : Editor
 
 	void Fall()
 	{
-		for (int i = HEI_NUM-1; i >=0; i--)
-		{
-			for (int j = 0; j < WID_NUM; j++)
-			{
-				if (mass[i, j] == 0)
-					continue;
-
-				if (i + 1 >= HEI_NUM)
-					continue;
-
-				var tmp = mass[i + 1, j];
-				mass[i + 1, j] = mass[i, j];
-				mass[i, j] = tmp;
-			}
-		}
+		myblockPosY++;
 	}
 
 	float GetInterval()
