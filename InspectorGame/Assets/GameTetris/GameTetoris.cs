@@ -17,7 +17,8 @@ public class GameTetorisEditor : Editor
 	private const int HEI_NUM = 23;
 	private const int BLOCK_TYPE = 2;
 	private const int BLOCK_SPACE = 4;
-
+	private const int BLOCK_INIT_POS_X = 4;
+	private const int BLOCK_INIT_POS_Y = 0;
 	private const float INTERVAL = 100.5f;
 
 	private int[,] mass = new int[HEI_NUM, WID_NUM];
@@ -25,6 +26,7 @@ public class GameTetorisEditor : Editor
 	private int myblockPosX = 0;
 	private int myblockPosY = 0;
 	private bool isStart = false;
+	private bool isGameOver = false;
 	private float deltaTime;
 	private float prevTime;
 	private float pos;
@@ -101,10 +103,7 @@ public class GameTetorisEditor : Editor
 			{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
 			{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 },														
 		};
-
-		Debug.Log(mass.GetLength(0));
-		Debug.Log(mass.GetLength(1));
-		myblockPosX = 3;
+		myblockPosX = 4;
 		myblockPosY = 0;
 	}
 
@@ -214,13 +213,9 @@ public class GameTetorisEditor : Editor
 	void Fall()
 	{
 		if (!Judge(0, 1))
-		{
 			Fixation();
-		}
 		else
-		{
 			Move(0, 1);
-		}
 	}
 
 	void Move(int _dirX = 0, int _dirY = 0)
@@ -246,9 +241,7 @@ public class GameTetorisEditor : Editor
 	void DrawButton()
 	{
 		if (GUILayout.Button(""))
-		{
 			InstantiateBlock();
-		}
 
 		if (GUILayout.Button("Rotate"))
 			Rotate();
