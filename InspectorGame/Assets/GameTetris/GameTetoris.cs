@@ -21,9 +21,9 @@ public class GameTetorisEditor : Editor
 	private const float INTERVAL = 1000.5f;
 
 	private int[,] mass = new int[HEI_NUM, WID_NUM];
-
-	private int[,] myblockPos = new int[3, 0];
 	private int[,] myBlock = new int[BLOCK_SPACE, BLOCK_SPACE];
+	private int myblockPosX = 0;
+	private int myblockPosY = 0;
 	private bool isStart = false;
 	private float deltaTime;
 	private float prevTime;
@@ -56,6 +56,11 @@ public class GameTetorisEditor : Editor
 				Init();
 			}
 			return;
+		}
+
+		if (GUILayout.Button(""))
+		{
+			InstantiateBlock();
 		}
 		CalcDeltaTime();
 		TimeCount();
