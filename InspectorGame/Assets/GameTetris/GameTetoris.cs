@@ -15,11 +15,13 @@ public class GameTetorisEditor : Editor
 	private const int WALL_NUM = 2;
 	private const int WID_NUM = 12;
 	private const int HEI_NUM = 23;
-	private const int BLOCK_TYPE = 3;
+	private const int BLOCK_TYPE = 7;
 	private const int BLOCK_SPACE = 4;
 	private const int BLOCK_INIT_POS_X = 4;
 	private const int BLOCK_INIT_POS_Y = 0;
-	private const float INTERVAL = 800.0f;
+	private const float START_INTERVAL = 600.0f;
+	private const float MIN_INTERVAL = 50.0f;
+	private const float MINUS_INTERVAL = 50.0f;
 
 	private int[,] mass = new int[HEI_NUM, WID_NUM];
 	private int[,] myBlock = new int[BLOCK_SPACE, BLOCK_SPACE];
@@ -29,6 +31,7 @@ public class GameTetorisEditor : Editor
 	private float deltaTime;
 	private float prevTime;
 	private float pos;
+	private float interval;
 	private float timeCnt;
 	private bool isStart = false;
 	private bool isGameOver = false;
@@ -36,22 +39,46 @@ public class GameTetorisEditor : Editor
 	private int[,,] massList = new int[BLOCK_TYPE, BLOCK_SPACE, BLOCK_SPACE]
 	{
 		{
-			{0,5,5,0 },
-			{0,5,5,0 },
-			{0,5,5,0 },
-			{0,5,5,0 }
+			{0,0,0,0 },
+			{0,0,0,0 },
+			{2,2,2,2 },
+			{0,0,0,0 }
 		},
 		{
-			{3,3,3,3 },
-			{3,3,3,3 },
-			{3,3,3,3 },
-			{3,3,3,3 }
+			{0,0,0,0 },
+			{0,3,3,0 },
+			{0,3,3,0 },
+			{0,0,0,0 }
 		},
 		{
-			{3,3,3,3 },
-			{3,3,3,3 },
-			{3,3,3,3 },
-			{3,3,3,3 }
+			{0,0,0,0 },
+			{0,0,4,4 },
+			{0,4,4,0 },
+			{0,0,0,0 }
+		},
+		{
+			{0,0,0,0 },
+			{5,5,0,0 },
+			{0,5,5,0 },
+			{0,0,0,0 }
+		},
+		{
+			{0,0,0,0 },
+			{0,0,6,0 },
+			{6,6,6,0 },
+			{0,0,0,0 }
+		},
+		{
+			{0,0,0,0 },
+			{0,7,0,0 },
+			{0,7,7,7 },
+			{0,0,0,0 }
+		},
+		{
+			{0,0,0,0 },
+			{0,0,8,0 },
+			{0,8,8,8 },
+			{0,0,0,0 }
 		},
 	};
 
@@ -60,7 +87,6 @@ public class GameTetorisEditor : Editor
 		Wall = -1,
 		None = 0,
 		Square = 1,
-		Delete = 99,
 	}
 
 	public override void OnInspectorGUI()
@@ -77,14 +103,14 @@ public class GameTetorisEditor : Editor
 			return;
 		}
 
+		DrawButton();
 		CalcDeltaTime();
 		TimeCount();
-		DrawButton();
 		DisplayMass();
 		Repaint();
 	}
 	
-	void Init()
+	void Initialize()
 	{
 		isStart = true;
 		isGameOver = false;
@@ -117,6 +143,7 @@ public class GameTetorisEditor : Editor
 			{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 },														
 		};
 
+		interval = START_INTERVAL;
 		myblockPosX = 4;
 		myblockPosY = 0;
 		InstantiateBlock();
@@ -125,7 +152,7 @@ public class GameTetorisEditor : Editor
 	void DisplayMass()
 	{
 		var windowWidth = EditorGUIUtility.currentViewWidth;
-		var w = (windowWidth / WID_NUM) - 8;
+		var w = (windowWidth / WID_NUM) - 6;
 		for (int i = 0; i < HEI_NUM; i++)
 		{
 			EditorGUILayout.BeginHorizontal();
@@ -150,8 +177,6 @@ public class GameTetorisEditor : Editor
 		}
 	}
 
-
-
 	void InstantiateBlock()
 	{
 		myblockPosX = 4;
@@ -168,7 +193,7 @@ public class GameTetorisEditor : Editor
 			}
 		}
 
-		isGameOver = !Judge(0, 0);
+		isGameOver = !Judge(0, 0, myBlock);
 		if (isGameOver)
 		{
 			Fixation();
@@ -195,7 +220,7 @@ public class GameTetorisEditor : Editor
 
 	void MoveCheck(int _dirX = 0, int _dirY = 0)
 	{
-		if (!Judge(_dirX, _dirY))
+		if (!Judge(_dirX, _dirY, myBlock))
 			return;
 
 		Move(_dirX, _dirY);
@@ -203,10 +228,20 @@ public class GameTetorisEditor : Editor
 	
 	void Rotate()
 	{
+		int [,]tmpBlock = new int[BLOCK_SPACE, BLOCK_SPACE];
+		for (int i = 0; i < BLOCK_SPACE; i++)
+		{
+			for (int j = 0; j < BLOCK_SPACE; j++)
+			{
+				tmpBlock[i, j] = myBlock[j,(BLOCK_SPACE - 1) - i];
+			}
+		}
 
+		if (Judge(0, 0, tmpBlock))
+			myBlock = tmpBlock;
 	}
 
-	bool Judge(int _dirX = 0, int _dirY = 0)
+	bool Judge(int _dirX, int _dirY, int[,] _checkBlock)
 	{
 		var isCanMove = true;
 		for (int i = 0; i < BLOCK_SPACE; i++)
@@ -215,7 +250,7 @@ public class GameTetorisEditor : Editor
 			{
 				if (!isCanMove)
 					continue;
-				if (myBlock[j, i] == (int)BlockInfo.None)
+				if (_checkBlock[j, i] == (int)BlockInfo.None)
 					continue;
 				var nextPosX = myblockPosX + i + _dirX;
 				var nextPosY = myblockPosY + j + _dirY;
@@ -235,7 +270,7 @@ public class GameTetorisEditor : Editor
 
 	void Fall()
 	{
-		if (!Judge(0, 1))
+		if (!Judge(0, 1, myBlock))
 		{
 			Fixation();
 			Delete();
@@ -277,7 +312,14 @@ public class GameTetorisEditor : Editor
 			for (int j = 0; j < WID_NUM; j++)
 				mass[0, j] = (int)BlockInfo.None;
 			i++;
+			DeleteLine();
 		}
+	}
+
+	void DeleteLine()
+	{
+		score += 100;
+		interval = Mathf.Clamp(interval - MINUS_INTERVAL, MIN_INTERVAL, int.MaxValue);
 	}
 
 	void Fixation()
@@ -301,7 +343,7 @@ public class GameTetorisEditor : Editor
 	{
 		if (GUILayout.Button("Start"))
 		{
-			Init();
+			Initialize();
 		}
 	}
 
@@ -309,7 +351,7 @@ public class GameTetorisEditor : Editor
 	{
 		if (GUILayout.Button("ReStart"))
 		{
-			Init();
+			Initialize();
 		}
 	}
 
@@ -331,20 +373,23 @@ public class GameTetorisEditor : Editor
 	{
 		switch (_massNum)
 		{
-			case -1: return new Color(0.4f, 0.4f, 0.4f, 1.0f);
-			case 0:  return Color.white;
+			case -1: return new Color(0.3f, 0.3f, 0.3f, 1.0f);
+			case 0:  return new Color(1.0f, 1.0f, 1.0f, 1.0f);
 			case 1:  return new Color(0.5f, 0.5f, 0.5f, 1.0f);
-			case 2:  return Color.red;
-			case 3:  return Color.green;
-			case 4:  return Color.yellow;
-			case 5:  return Color.blue;
+			case 2:  return new Color(0.0f, 1.0f, 1.0f, 1.0f);
+			case 3:  return new Color(1.0f, 1.0f, 0.0f, 1.0f);
+			case 4:  return new Color(0.0f, 1.0f, 0.0f, 1.0f);
+			case 5:  return new Color(1.0f, 0.0f, 0.0f, 1.0f);
+			case 6:  return new Color(0.0f, 0.0f, 1.0f, 1.0f);
+			case 7:  return new Color(1.0f, 0.4f, 0.0f, 1.0f);
+			case 8:  return new Color(1.0f, 0.0f, 1.0f, 1.0f);
 		}
 		return Color.white;
 	}
 
 	float GetInterval()
 	{
-		return INTERVAL;
+		return START_INTERVAL;
 	}
 }
 #endif

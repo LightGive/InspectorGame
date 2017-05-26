@@ -165,9 +165,6 @@ public class Game1024Editor : Editor
 
 	void Reset(int _row, int _colum)
 	{
-		var str = "あいうえお";
-		Debug.Log(str.Substring(0,1));
-
 		Score = 0;
 		highScore = EditorPrefs.GetInt(SAVE_SCORE_KEY + _row.ToString("00") + _colum.ToString("00"), 0);
 		mass = new int[_row, _colum];
