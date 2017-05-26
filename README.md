@@ -9,7 +9,8 @@
 ・2048  
 ![Alt text](/InspectorGame/ExampleImage/Example_2048.gif)  
   
-・テトリス  
+    
+・テトリス  
 ![Alt text](/InspectorGame/ExampleImage/Example_Tetoris.gif)  
 今後作るもの  
 ------------------------------- 
