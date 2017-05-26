@@ -103,10 +103,10 @@ public class GameTetorisEditor : Editor
 			return;
 		}
 
-		DrawButton();
 		CalcDeltaTime();
 		TimeCount();
 		DisplayMass();
+		DrawButton();
 		Repaint();
 	}
 	
@@ -342,21 +342,19 @@ public class GameTetorisEditor : Editor
 	void DrawStart()
 	{
 		if (GUILayout.Button("Start"))
-		{
 			Initialize();
-		}
 	}
 
 	void DrawGameover()
 	{
 		if (GUILayout.Button("ReStart"))
-		{
 			Initialize();
-		}
 	}
 
 	void DrawButton()
 	{
+		GUI.color = Color.white;
+		EditorGUILayout.Space();
 		if (GUILayout.Button("Rotate"))
 			Rotate();
 		EditorGUILayout.BeginHorizontal();
