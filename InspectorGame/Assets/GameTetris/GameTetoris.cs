@@ -28,6 +28,8 @@ public class GameTetorisEditor : Editor
 	private int myblockPosX = 0;
 	private int myblockPosY = 0;
 	private int score;
+	private int inputVecX;
+	private int inputVecY;
 	private float deltaTime;
 	private float prevTime;
 	private float pos;
@@ -353,17 +355,19 @@ public class GameTetorisEditor : Editor
 
 	void DrawButton()
 	{
+		var e = Event.current;
+
 		GUI.color = Color.white;
 		EditorGUILayout.Space();
-		if (GUILayout.Button("Rotate"))
+		if (GUILayout.Button("Rotate") || (e.type == EventType.KeyDown && e.keyCode == KeyCode.UpArrow))
 			Rotate();
 		EditorGUILayout.BeginHorizontal();
-		if (GUILayout.Button("Left"))
+		if (GUILayout.Button("Left") || (e.type == EventType.KeyDown && e.keyCode == KeyCode.LeftArrow))
 			MoveCheck(-1, 0);
-		if (GUILayout.Button("Right"))
+		if (GUILayout.Button("Right") || (e.type == EventType.KeyDown && e.keyCode == KeyCode.RightArrow))
 			MoveCheck(1, 0);
 		EditorGUILayout.EndHorizontal();
-		if (GUILayout.Button("Down"))
+		if (GUILayout.Button("Down") || (e.type == EventType.KeyDown && e.keyCode == KeyCode.DownArrow))
 			Fall();
 	}
 
