@@ -12,6 +12,7 @@ public class GameTetoris : MonoBehaviour{ }
 [CustomEditor(typeof(GameTetoris))]
 public class GameTetorisEditor : Editor
 {
+	private const string SAVE_KEY = "SAVE_SCORE_KEY";
 	private const int WALL_NUM = 2;
 	private const int WID_NUM = 12;
 	private const int HEI_NUM = 23;
@@ -21,15 +22,13 @@ public class GameTetorisEditor : Editor
 	private const int BLOCK_INIT_POS_Y = 0;
 	private const float START_INTERVAL = 600.0f;
 	private const float MIN_INTERVAL = 50.0f;
-	private const float MINUS_INTERVAL = 50.0f;
+	private const float MINUS_INTERVAL = 20.0f;
 
 	private int[,] mass = new int[HEI_NUM, WID_NUM];
 	private int[,] myBlock = new int[BLOCK_SPACE, BLOCK_SPACE];
 	private int myblockPosX = 0;
 	private int myblockPosY = 0;
 	private int score;
-	private int inputVecX;
-	private int inputVecY;
 	private float deltaTime;
 	private float prevTime;
 	private float pos;
@@ -213,7 +212,7 @@ public class GameTetorisEditor : Editor
 	void TimeCount()
 	{
 		timeCnt += deltaTime;
-		if (timeCnt > GetInterval())
+		if (timeCnt > interval)
 		{
 			timeCnt = 0.0f;
 			Fall();
@@ -338,6 +337,7 @@ public class GameTetorisEditor : Editor
 
 	void GameOver()
 	{
+		EditorPrefs.SetInt(SAVE_KEY, score);
 		EditorUtility.DisplayDialog("Gameover", "You Score " + score.ToString("000000"), "OK");
 	}
 
@@ -345,12 +345,17 @@ public class GameTetorisEditor : Editor
 	{
 		if (GUILayout.Button("Start"))
 			Initialize();
+		EditorGUILayout.Space();
+		EditorGUILayout.LabelField("HightScore", EditorPrefs.GetInt(SAVE_KEY, 0).ToString("000000"));
 	}
 
 	void DrawGameover()
 	{
 		if (GUILayout.Button("ReStart"))
 			Initialize();
+		EditorGUILayout.Space();
+		EditorGUILayout.LabelField("Score", score.ToString("000000"));
+		EditorGUILayout.LabelField("HightScore", EditorPrefs.GetInt(SAVE_KEY,0).ToString("000000"));
 	}
 
 	void DrawButton()
@@ -387,11 +392,6 @@ public class GameTetorisEditor : Editor
 			case 8:  return new Color(1.0f, 0.0f, 1.0f, 1.0f);
 		}
 		return Color.white;
-	}
-
-	float GetInterval()
-	{
-		return START_INTERVAL;
 	}
 }
 #endif
