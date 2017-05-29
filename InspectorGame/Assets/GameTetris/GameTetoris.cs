@@ -337,7 +337,8 @@ public class GameTetorisEditor : Editor
 
 	void GameOver()
 	{
-		EditorPrefs.SetInt(SAVE_KEY, score);
+		if (EditorPrefs.GetInt(SAVE_KEY, 0) <= score)
+			EditorPrefs.SetInt(SAVE_KEY, score);
 		EditorUtility.DisplayDialog("Gameover", "You Score " + score.ToString("000000"), "OK");
 	}
 
@@ -364,15 +365,15 @@ public class GameTetorisEditor : Editor
 
 		GUI.color = Color.white;
 		EditorGUILayout.Space();
-		if (GUILayout.Button("Rotate") || (e.type == EventType.KeyDown && e.keyCode == KeyCode.UpArrow))
+		if (GUILayout.Button("Rotate") || (e.type == EventType.KeyDown && (e.keyCode == KeyCode.UpArrow|| e.keyCode == KeyCode.W)))
 			Rotate();
 		EditorGUILayout.BeginHorizontal();
-		if (GUILayout.Button("Left") || (e.type == EventType.KeyDown && e.keyCode == KeyCode.LeftArrow))
+		if (GUILayout.Button("Left") || (e.type == EventType.KeyDown && (e.keyCode == KeyCode.LeftArrow || e.keyCode == KeyCode.A)))
 			MoveCheck(-1, 0);
-		if (GUILayout.Button("Right") || (e.type == EventType.KeyDown && e.keyCode == KeyCode.RightArrow))
+		if (GUILayout.Button("Right") || (e.type == EventType.KeyDown && (e.keyCode == KeyCode.RightArrow || e.keyCode == KeyCode.D)))
 			MoveCheck(1, 0);
 		EditorGUILayout.EndHorizontal();
-		if (GUILayout.Button("Down") || (e.type == EventType.KeyDown && e.keyCode == KeyCode.DownArrow))
+		if (GUILayout.Button("Down") || (e.type == EventType.KeyDown && (e.keyCode == KeyCode.DownArrow || e.keyCode == KeyCode.S)))
 			Fall();
 	}
 
