@@ -14,13 +14,19 @@ public class GamePuyopuyoEditor: Editor
 {
 	private const int WID_NUM = 8;
 	private const int HEI_NUM = 13;
+	private const int INIT_X = 4;
+	private const int INIT_Y = 0;
 
 	private bool isStart = false;
 	private bool isGameOver = false;
 	private float deltaTime = 0.0f;
 	private float prevTime = 0.0f;
-	private Puyo[,] cell = new Puyo[HEI_NUM, WID_NUM];
-	
+	private int[,] cell = new int[WID_NUM, HEI_NUM];
+	private int x = 0;
+	private int y = 0;
+	private PuyoDir subPuyo;
+	private Puyo mainPuyo;
+
 	enum Puyo
 	{
 		Wall = -1,
@@ -28,7 +34,17 @@ public class GamePuyopuyoEditor: Editor
 		Red, 
 		Blue,
 		Green,
-		Yellow
+		Yellow,
+		Max,
+	}
+
+	enum PuyoDir
+	{
+		Right = 0,
+		Bottom = 1,
+		Left = 2,
+		Top = 3,
+		Max = 4,
 	}
 
 	public override void OnInspectorGUI()
@@ -54,12 +70,13 @@ public class GamePuyopuyoEditor: Editor
 	{
 		var windowWidth = EditorGUIUtility.currentViewWidth;
 		var w = (windowWidth / WID_NUM) - 6;
-		for (int i = 0; i < WID_NUM; i++)
+		for (int i = 0; i < HEI_NUM; i++)
 		{
 			EditorGUILayout.BeginHorizontal();
-			for (int j = 0; j < HEI_NUM; j++)
+			for (int j = 0; j < WID_NUM; j++)
 			{
-				GUILayout.Label(GetCellText(cell[i, j]));
+
+				EditorGUILayout.LabelField(GetCellText(cell[j, i]), GUILayout.Width(10));
 			}
 			EditorGUILayout.EndHorizontal();
 		}
@@ -67,32 +84,22 @@ public class GamePuyopuyoEditor: Editor
 
 	void Initialize()
 	{
-		//mass = new int[,]
-		//{
-		//	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-		//	{-1,-1,-1, 0, 0, 0, 0, 0, 0,-1,-1,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,-1 },
-		//	{-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 },
-		//};
+		for (int i = 0; i < HEI_NUM; i++)
+		{
+			for (int j = 0; j < WID_NUM; j++)
+			{
+				if (j == 0 || j == WID_NUM - 1 || i == HEI_NUM-1)
+					cell[j, i] = -1;
+			}
+		}
+
+		x = INIT_X;
+		y = INIT_Y;
+		cell[x + 1, y] = (int)GetRandomPuyo();
+		cell[x, y] = (int)GetRandomPuyo();
+		
+		
+		isStart = true;
 	}
 
 	void DrawStart()
@@ -110,9 +117,9 @@ public class GamePuyopuyoEditor: Editor
 		prevTime = now;
 	}
 
-	string GetCellText(Puyo _puyo)
+	string GetCellText(int _puyo)
 	{
-		switch (_puyo)
+		switch ((Puyo)_puyo)
 		{
 			case Puyo.None: return "";
 			case Puyo.Wall: return "■";
@@ -125,9 +132,14 @@ public class GamePuyopuyoEditor: Editor
 		return "";
 	}
 
-	Color GetCellColor(Puyo _puyo)
+	void Rotate()
 	{
-		switch (_puyo)
+		subPuyo = (PuyoDir)(((int)subPuyo + 1) % (int)PuyoDir.Max);
+	}
+
+	Color GetCellColor(int _puyo)
+	{
+		switch ((Puyo)_puyo)
 		{
 			case Puyo.Wall: return Color.white;
 			case Puyo.None: return Color.white;
@@ -138,6 +150,23 @@ public class GamePuyopuyoEditor: Editor
 		}
 
 		return Color.white;
+	}
+
+	Puyo GetSubPuyo()
+	{
+		switch (subPuyo)
+		{
+			case PuyoDir.Right:return (Puyo)cell[x + 1, y];
+			case PuyoDir.Bottom: return (Puyo)cell[x, y + 1];
+			case PuyoDir.Left: return (Puyo)cell[x-1, y];
+			case PuyoDir.Top: return (Puyo)cell[x, y - 1];
+		}
+		return (Puyo)cell[x, y];
+	}
+
+	Puyo GetRandomPuyo()
+	{
+		return (Puyo)Random.Range(1, (int)Puyo.Max);
 	}
 }
 #endif
