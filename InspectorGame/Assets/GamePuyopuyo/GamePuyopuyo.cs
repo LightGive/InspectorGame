@@ -19,8 +19,18 @@ public class GamePuyopuyoEditor: Editor
 	private bool isGameOver = false;
 	private float deltaTime = 0.0f;
 	private float prevTime = 0.0f;
-	private int[,] mass = new int[HEI_NUM, WID_NUM];
+	private Puyo[,] cell = new Puyo[HEI_NUM, WID_NUM];
 	
+	enum Puyo
+	{
+		Wall = -1,
+		None = 0,
+		Red, 
+		Blue,
+		Green,
+		Yellow
+	}
+
 	public override void OnInspectorGUI()
 	{
 		if (!isStart)
@@ -44,12 +54,12 @@ public class GamePuyopuyoEditor: Editor
 	{
 		var windowWidth = EditorGUIUtility.currentViewWidth;
 		var w = (windowWidth / WID_NUM) - 6;
-		for (int i = 0; i < HEI_NUM; i++)
+		for (int i = 0; i < WID_NUM; i++)
 		{
 			EditorGUILayout.BeginHorizontal();
-			for (int j = 0; j < WID_NUM; j++)
+			for (int j = 0; j < HEI_NUM; j++)
 			{
-
+				GUILayout.Label(GetCellText(cell[i, j]));
 			}
 			EditorGUILayout.EndHorizontal();
 		}
@@ -98,6 +108,36 @@ public class GamePuyopuyoEditor: Editor
 		float now = (float)EditorApplication.timeSinceStartup;
 		deltaTime = (now - prevTime) * 800;
 		prevTime = now;
+	}
+
+	string GetCellText(Puyo _puyo)
+	{
+		switch (_puyo)
+		{
+			case Puyo.None: return "";
+			case Puyo.Wall: return "■";
+			case Puyo.Red: 
+			case Puyo.Blue:
+			case Puyo.Green:
+            case Puyo.Yellow: return "●";
+		}
+
+		return "";
+	}
+
+	Color GetCellColor(Puyo _puyo)
+	{
+		switch (_puyo)
+		{
+			case Puyo.Wall: return Color.white;
+			case Puyo.None: return Color.white;
+			case Puyo.Red:  return Color.red;
+			case Puyo.Blue: return Color.blue;
+			case Puyo.Green: return Color.green;
+			case Puyo.Yellow: return Color.yellow;
+		}
+
+		return Color.white;
 	}
 }
 #endif
