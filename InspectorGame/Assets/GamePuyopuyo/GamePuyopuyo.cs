@@ -14,7 +14,7 @@ public class GamePuyopuyoEditor: Editor
 {
 	private const int WID_NUM = 8;
 	private const int HEI_NUM = 13;
-	private const int INIT_X = 4;
+	private const int INIT_X = 3;
 	private const int INIT_Y = 0;
 
 	private bool isStart = false;
@@ -24,6 +24,8 @@ public class GamePuyopuyoEditor: Editor
 	private int[,] cell = new int[WID_NUM, HEI_NUM];
 	private int x = 0;
 	private int y = 0;
+	private float interval;
+	private float timeCnt;
 	private PuyoDir subPuyo;
 	private Puyo mainPuyo;
 
@@ -75,8 +77,8 @@ public class GamePuyopuyoEditor: Editor
 			EditorGUILayout.BeginHorizontal();
 			for (int j = 0; j < WID_NUM; j++)
 			{
-
-				EditorGUILayout.LabelField(GetCellText(cell[j, i]), GUILayout.Width(10));
+				GUI.color = GetCellColor(cell[j, i]);
+				EditorGUILayout.LabelField(GetCellText(cell[j, i]), GUILayout.Width(15));
 			}
 			EditorGUILayout.EndHorizontal();
 		}
@@ -93,13 +95,31 @@ public class GamePuyopuyoEditor: Editor
 			}
 		}
 
+		Create();
+		isStart = true;
+	}
+
+	void Create()
+	{
 		x = INIT_X;
 		y = INIT_Y;
-		cell[x + 1, y] = (int)GetRandomPuyo();
 		cell[x, y] = (int)GetRandomPuyo();
-		
-		
-		isStart = true;
+		cell[x + 1, y] = (int)GetRandomPuyo();
+	}
+
+	void TimeCount()
+	{
+		timeCnt += deltaTime;
+		if (timeCnt > interval)
+		{
+			timeCnt = 0.0f;
+			Fall();
+		}
+	}
+
+	void Fall()
+	{
+		var tmp = cell[x, y];
 	}
 
 	void DrawStart()
@@ -122,11 +142,11 @@ public class GamePuyopuyoEditor: Editor
 		switch ((Puyo)_puyo)
 		{
 			case Puyo.None: return "";
-			case Puyo.Wall: return "■";
+			case Puyo.Wall: return "◆";
 			case Puyo.Red: 
 			case Puyo.Blue:
 			case Puyo.Green:
-            case Puyo.Yellow: return "●";
+            case Puyo.Yellow: return "〇";
 		}
 
 		return "";
