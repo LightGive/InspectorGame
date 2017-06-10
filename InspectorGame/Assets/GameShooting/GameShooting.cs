@@ -526,6 +526,7 @@ public class ShootingEditor : Editor
 		EditorGUILayout.Space();
 		EditorGUILayout.LabelField("HightScore", EditorPrefs.GetInt(SAVE_KEY, 0).ToString("000000"));
 		EditorGUILayout.Space();
+		Repaint();
 	}
 
 	/// <summary>
@@ -539,6 +540,7 @@ public class ShootingEditor : Editor
 		EditorGUILayout.Space();
 		EditorGUILayout.LabelField("HightScore", EditorPrefs.GetInt(SAVE_KEY, 0).ToString("000000"));
 		EditorGUILayout.Space();
+		Repaint();
 	}
 
 	/// <summary>
