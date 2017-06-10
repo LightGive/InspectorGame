@@ -10,7 +10,7 @@ public class GameShooting : MonoBehaviour {}
 
 #if UNITY_EDITOR
 [CustomEditor(typeof(GameShooting))]
-public class ShootingEditor: Editor
+public class ShootingEditor : Editor
 {
 	private const int ENEMY_MAX_NUM = 10;
 	private const float TEXTURE_SIZE = 0.005f;
@@ -32,7 +32,7 @@ public class ShootingEditor: Editor
 	private float generateTimeCnt = 0.0f;
 
 	private Rect areaRect;
-	private Vector2 bulletDefPos = new Vector2(0.0f,0.0f);
+	private Vector2 bulletDefPos = new Vector2(0.0f, 0.0f);
 	private Vector2 playerPos;
 	private Vector2 playerSize;
 	private Vector2 playerVec;
@@ -69,7 +69,7 @@ public class ShootingEditor: Editor
 		public int bulletNo = 0;
 		public float speed = 1.0f;
 
-		public Bullet(Vector2 _pos,Vector2 _vec,bool _isActive,bool _isPlayerBullet,int _bulletNo,float _speed)
+		public Bullet(Vector2 _pos, Vector2 _vec, bool _isActive, bool _isPlayerBullet, int _bulletNo, float _speed)
 		{
 			pos = _pos;
 			vec = _vec;
@@ -94,16 +94,16 @@ public class ShootingEditor: Editor
 		public int hp = 0;
 		public float speed = 1.0f;
 
-		private float bulletGenerateInterval= 0.5f;
+		private float bulletGenerateInterval = 0.5f;
 		private float bulletGenerateTimeCnt;
 
 		//弾を生成
 		public void GenerateBullet(float _timeStep)
 		{
-			if(isGenerateBullet)
+			if (isGenerateBullet)
 				return;
-			bulletGenerateTimeCnt+= _timeStep;
-			if(bulletGenerateTimeCnt < bulletGenerateInterval)
+			bulletGenerateTimeCnt += _timeStep;
+			if (bulletGenerateTimeCnt < bulletGenerateInterval)
 				return;
 
 			isGenerateBullet = true;
@@ -122,7 +122,7 @@ public class ShootingEditor: Editor
 	/// </summary>
 	public override void OnInspectorGUI()
 	{
-		if(!isStart)
+		if (!isStart)
 		{
 			DrawStart();
 			return;
@@ -155,26 +155,26 @@ public class ShootingEditor: Editor
 		//アイコンをロード
 		enemyTex = new Texture2D[3];
 		bulletTex = new Texture2D[2];
-		player = EditorGUIUtility.FindTexture( "SceneAsset Icon" );
+		player = EditorGUIUtility.FindTexture("SceneAsset Icon");
 		enemyTex[0] = EditorGUIUtility.FindTexture("console.warnicon");
 		enemyTex[1] = EditorGUIUtility.FindTexture("console.erroricon");
 		enemyTex[2] = EditorGUIUtility.FindTexture("ViewToolOrbit");
-		bulletTex[0] = EditorGUIUtility.FindTexture( "PauseButton" );
-		bulletTex[1] = EditorGUIUtility.FindTexture( "MoveTool" );
+		bulletTex[0] = EditorGUIUtility.FindTexture("PauseButton");
+		bulletTex[1] = EditorGUIUtility.FindTexture("MoveTool");
 
 		playerPos = new Vector2(0.5f, 1.0f);
 
 		//自分の弾を生成
-		for (int i= 0;i < 20; i++)
+		for (int i = 0; i < 20; i++)
 		{
-			var bullet = new Bullet(bulletDefPos,Vector2.zero,false,true,0,1.0f);
+			var bullet = new Bullet(bulletDefPos, Vector2.zero, false, true, 0, 1.0f);
 			bulletList.Add(bullet);
 		}
 
 		//敵の弾を生成
 		for (int i = 0; i < 500; i++)
 		{
-			var bullet = new Bullet(bulletDefPos, Vector2.zero, false, false,1, 1.0f);
+			var bullet = new Bullet(bulletDefPos, Vector2.zero, false, false, 1, 1.0f);
 			bulletList.Add(bullet);
 		}
 
@@ -207,22 +207,22 @@ public class ShootingEditor: Editor
 	void RendererWindow()
 	{
 		//プレイヤーを表示
-		Graphics.DrawTexture(GetTextureRect(playerPos,player,1.0f), player);
+		Graphics.DrawTexture(GetTextureRect(playerPos, player, 1.0f), player);
 
 		//弾を表示
 		foreach (var bullet in bulletList)
 		{
 			//有効な弾だけ表示
 			if (bullet.isActive)
-				GUI.DrawTexture(GetTextureRect(bullet.pos, bulletTex[bullet.bulletNo],1.0f), bulletTex[bullet.bulletNo]);
+				GUI.DrawTexture(GetTextureRect(bullet.pos, bulletTex[bullet.bulletNo], 1.0f), bulletTex[bullet.bulletNo]);
 		}
 
 		//敵を表示
-		foreach(var enemy in enemyList)
+		foreach (var enemy in enemyList)
 		{
 			//有効な敵だけ表示
 			if (enemy.isActive)
-				GUI.DrawTexture(GetTextureRect(enemy.pos, enemyTex[enemy.enemyNo],1.0f), enemyTex[enemy.enemyNo]);
+				GUI.DrawTexture(GetTextureRect(enemy.pos, enemyTex[enemy.enemyNo], 1.0f), enemyTex[enemy.enemyNo]);
 		}
 	}
 
@@ -231,11 +231,8 @@ public class ShootingEditor: Editor
 	/// </summary>
 	void PlayerMove()
 	{
-		//プレイヤーのサイズを取得
-		Vector2 pSize = new Vector2(player.width * TEXTURE_SIZE,player.height * TEXTURE_SIZE);
-
 		//次の座標を設定
-		Vector2 nextPos = playerPos + playerVec*PLAYER_SPEED * deltaTime;
+		Vector2 nextPos = playerPos + playerVec * PLAYER_SPEED * deltaTime;
 
 		//X座標とY座標を設定する
 		playerPos.x = Mathf.Clamp(nextPos.x, 0.0f, 1.0f);
@@ -253,41 +250,41 @@ public class ShootingEditor: Editor
 		{
 			//次に撃つまでのintervalがあり、かつキーが押されている時
 			bulletTimeCnt = 0.0f;
-			ShotBullet(true,playerPos,new Vector2(0, -1));
+			ShotBullet(true, playerPos, new Vector2(0, -1));
 		}
 
 		bulletTimeCnt += deltaTime;
 
-		foreach(var e in enemyList)
+		foreach (var e in enemyList)
 		{
-			if(!e.isActive)
+			if (!e.isActive)
 				return;
-			
+
 			e.GenerateBullet(deltaTime);
-			if(!e.isGenerateBullet)
+			if (!e.isGenerateBullet)
 				continue;
 
 			e.GenerateBulletEnd();
-			var ran = Random.Range(0,3);
+			var ran = Random.Range(0, 3);
 			var bulletVec = Vector2.zero;
 
 			var bulletCnt = 3;
-			if(e.enemyNo == 0)
-				bulletCnt =1;
-			else if(e.enemyNo == 1)
-				bulletCnt =3;
-			else if(e.enemyNo == 2)
-				bulletCnt =5;
+			if (e.enemyNo == 0)
+				bulletCnt = 1;
+			else if (e.enemyNo == 1)
+				bulletCnt = 3;
+			else if (e.enemyNo == 2)
+				bulletCnt = 5;
 
 			var angleInterval = 25.0f;
 			float rad = 0.0f;
 			float x = 0.0f;
 			float y = 0.0f;
-			float angleOffset= 0.0f;
+			float angleOffset = 0.0f;
 
-			for(int i=0;i<bulletCnt;i++)
+			for (int i = 0; i < bulletCnt; i++)
 			{
-				switch(ran)
+				switch (ran)
 				{
 					case 0:
 						angleOffset = -20;
@@ -299,12 +296,11 @@ public class ShootingEditor: Editor
 						angleOffset = 20;
 						break;
 				}
-				rad =((i * angleInterval)+angleOffset)* (Mathf.PI / 180); 
-				x = (float)(Mathf.Sin (rad) * 0.1f);
-				y = (float)(Mathf.Cos (rad) * 0.1f);
-				bulletVec = new Vector2(x,y);
-				Debug.Log("弾生成"+bulletVec);
-				ShotBullet(false,e.pos,bulletVec);
+				rad = ((i * angleInterval) + angleOffset) * (Mathf.PI / 180);
+				x = (float)(Mathf.Sin(rad) * 0.1f);
+				y = (float)(Mathf.Cos(rad) * 0.1f);
+				bulletVec = new Vector2(x, y);
+				ShotBullet(false, e.pos, bulletVec);
 			}
 		}
 	}
@@ -313,13 +309,13 @@ public class ShootingEditor: Editor
 	/// <summary>
 	/// 弾を発射する
 	/// </summary>
-	void ShotBullet(bool _isPlayer,Vector2 _generatePos,Vector2 _vec)
+	void ShotBullet(bool _isPlayer, Vector2 _generatePos, Vector2 _vec)
 	{
 		foreach (Bullet bullet in bulletList)
 		{
-			if(bullet.isActive)
+			if (bullet.isActive)
 				continue;
-			
+
 			if (bullet.isPlayerBullet)
 			{
 				bullet.isActive = true;
@@ -351,7 +347,7 @@ public class ShootingEditor: Editor
 		generateTimeCnt += deltaTime;
 
 		var enemyCnt = 0;
-		foreach(var enemy in enemyList)
+		foreach (var enemy in enemyList)
 		{
 			if (enemy.isActive)
 				enemyCnt++;
@@ -363,9 +359,9 @@ public class ShootingEditor: Editor
 			foreach (var e in enemyList)
 			{
 				var idx = 0;
-				if(score > 2000)
+				if (score > 2000)
 					idx = 2;
-				else if (score > 1000) 
+				else if (score > 1000)
 					idx = 1;
 
 				//もしアクティブじゃないとき
@@ -376,7 +372,7 @@ public class ShootingEditor: Editor
 					e.hp = 10;
 					e.speed = 0.5f;
 					e.vec = new Vector2(Random.Range(-0.2f, 0.2f), 0.2f);
-					var insPos = new Vector2(Random.Range(0.3f,0.7f),0.0f);
+					var insPos = new Vector2(Random.Range(0.3f, 0.7f), 0.0f);
 					e.pos = insPos;
 					generateTimeCnt = 0.0f;
 
@@ -394,18 +390,18 @@ public class ShootingEditor: Editor
 	void HitCheck()
 	{
 		//自弾と敵の当たり判定
-		foreach(var bullet in bulletList)
+		foreach (var bullet in bulletList)
 		{
 			if (!bullet.isActive)
 				continue;
-		
-			if(bullet.isPlayerBullet)
+
+			if (bullet.isPlayerBullet)
 			{
 				foreach (var enemy in enemyList)
 				{
 					if (!enemy.isActive)
 						continue;
-					
+
 					if (Vector2.Distance(enemy.pos, bullet.pos) < 0.05f)
 					{
 						//敵と弾を削除
@@ -418,7 +414,7 @@ public class ShootingEditor: Editor
 			}
 			else
 			{
-				if(Vector2.Distance(playerPos,bullet.pos)<0.03f)
+				if (Vector2.Distance(playerPos, bullet.pos) < 0.03f)
 					GameOver();
 			}
 		}
@@ -428,7 +424,7 @@ public class ShootingEditor: Editor
 		{
 			if (!enemy.isActive)
 				continue;
-			
+
 			//敵とプレイヤーが当たった時
 			if (Vector2.Distance(enemy.pos, playerPos) < 0.1f)
 				GameOver();
@@ -482,7 +478,7 @@ public class ShootingEditor: Editor
 				Vector2 eSize = new Vector2(enemyTex[enemy.enemyNo].width * TEXTURE_SIZE, enemyTex[enemy.enemyNo].height * TEXTURE_SIZE);
 
 				//X座標とY座標を設定する
-				if (enemy.pos.x > 1.0f ||enemy.pos.x < 0 ||enemy.pos.y>1.0f)
+				if (enemy.pos.x > 1.0f || enemy.pos.x < 0 || enemy.pos.y > 1.0f)
 				{
 					enemy.isActive = false;
 					enemy.pos = bulletDefPos;
@@ -502,9 +498,9 @@ public class ShootingEditor: Editor
 	/// <returns></returns>
 	Rect GetTextureRect(Vector2 _pos, Texture2D _tex, float _scale)
 	{
-		Vector2 size = new Vector2(_tex.width * _scale, _tex.height* _scale);
-		Vector2 pos = new Vector2(areaRect.x + (_pos.x* areaRect.width)-(size.x/2.0f), areaRect.y + (_pos.y*areaRect.height)-(size.y/2.0f));
-		return new Rect(pos.x,pos.y, size.x,size.y);
+		Vector2 size = new Vector2(_tex.width * _scale, _tex.height * _scale);
+		Vector2 pos = new Vector2(areaRect.x + (_pos.x * areaRect.width) - (size.x / 2.0f), areaRect.y + (_pos.y * areaRect.height) - (size.y / 2.0f));
+		return new Rect(pos.x, pos.y, size.x, size.y);
 	}
 
 	/// <summary>
@@ -513,9 +509,9 @@ public class ShootingEditor: Editor
 	void GameOver()
 	{
 		isGameOver = true;
-		if(EditorPrefs.GetInt(SAVE_KEY, 0)<score)
-			EditorPrefs.SetInt(SAVE_KEY,score);
-		UnityEditor.EditorUtility.DisplayDialog("GameOver", "You Score : "+score.ToString("00"), "OK");
+		if (EditorPrefs.GetInt(SAVE_KEY, 0) < score)
+			EditorPrefs.SetInt(SAVE_KEY, score);
+		UnityEditor.EditorUtility.DisplayDialog("GameOver", "You Score : " + score.ToString("00"), "OK");
 
 	}
 
