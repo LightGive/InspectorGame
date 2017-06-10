@@ -316,10 +316,10 @@ public class ShootingEditor : Editor
 			if (bullet.isActive)
 				continue;
 
-			if (bullet.isPlayerBullet)
+			if (_isPlayer)
 			{
 				bullet.isActive = true;
-				bullet.isPlayerBullet = _isPlayer;
+				bullet.isPlayerBullet = true;
 				bullet.pos = _generatePos;
 				bullet.vec = _vec;
 				bullet.speed = PLAYER_BULLET_SPEED;
@@ -329,7 +329,7 @@ public class ShootingEditor : Editor
 			else
 			{
 				bullet.isActive = true;
-				bullet.isPlayerBullet = _isPlayer;
+				bullet.isPlayerBullet = false;
 				bullet.pos = _generatePos;
 				bullet.vec = _vec;
 				bullet.speed = PLAYER_BULLET_SPEED;
