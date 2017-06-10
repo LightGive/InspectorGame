@@ -520,6 +520,7 @@ public class ShootingEditor : Editor
 	/// </summary>
 	void DrawStart()
 	{
+		EditorGUILayout.Space();
 		if (GUILayout.Button("Start"))
 			Init();
 		EditorGUILayout.Space();
@@ -532,6 +533,7 @@ public class ShootingEditor : Editor
 	/// </summary>
 	void DrawGameOver()
 	{
+		EditorGUILayout.Space();
 		if (GUILayout.Button("ReStart"))
 			Init();
 		EditorGUILayout.Space();
