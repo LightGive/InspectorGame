@@ -6,10 +6,10 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-public class Shooting : MonoBehaviour {}
+public class GameShooting : MonoBehaviour {}
 
 #if UNITY_EDITOR
-[CustomEditor(typeof(Shooting))]
+[CustomEditor(typeof(GameShooting))]
 public class ShootingEditor: Editor
 {
 	private const int ENEMY_MAX_NUM = 10;

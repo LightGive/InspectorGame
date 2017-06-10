@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="Assets\Game2048\Game2048.cs" />
     <Compile Include="Assets\GamePuyopuyo\GamePuyopuyo.cs" />
+    <Compile Include="Assets\GameShooting\GameShooting.cs" />
     <Compile Include="Assets\GameTetris\GameTetoris.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
