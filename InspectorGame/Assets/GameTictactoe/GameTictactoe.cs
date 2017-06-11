@@ -10,10 +10,18 @@ public class GameTictactoe : MonoBehaviour {}
 public class GameTictactoeEditor : Editor
 {
 	private const int CELL_COUNT = 3;
-	private int[] cell = new int[CELL_COUNT * CELL_COUNT];
+	private int[] cell;
 	private int nowTurn = 1;
 	private bool isInit = false;
 	private bool isGameOver = false;
+
+	private enum Opponent
+	{
+		Player		= 0,
+		CPU_Easy	= 1,
+		CPU_Normal	= 2,
+		CPU_Hard	= 3,
+	}
 
 	private enum Mark
 	{
@@ -25,11 +33,7 @@ public class GameTictactoeEditor : Editor
 	public override void OnInspectorGUI()
 	{
 		if (!isInit)
-			Init();
-
-		EditorGUILayout.Space();
-		EditorGUILayout.LabelField("GameTictactoe");
-		EditorGUILayout.Space();
+			DrawSelectButton();
 
 		EditorGUILayout.BeginVertical();
 		for (int i = 0; i < CELL_COUNT; i++)
@@ -58,6 +62,18 @@ public class GameTictactoeEditor : Editor
 
 		DrawInitButton();
 
+	}
+
+	void DrawSelectButton()
+	{
+		if (GUILayout.Button("Player VS Player"))
+			Init();
+		if (GUILayout.Button("Player VS CPU(Easy)"))
+			Init();
+		if (GUILayout.Button("Player VS CPU(Normal)"))
+			Init();
+		if (GUILayout.Button("Player VS CPU(Hard)"))
+			Init();
 	}
 
 	void DrawInitButton()
