@@ -544,6 +544,14 @@ public class ShootingEditor : Editor
 	}
 
 	/// <summary>
+	/// セレクト画面を描画する
+	/// </summary>
+	void DrawSelectPlayer()
+	{
+
+	}
+
+	/// <summary>
 	/// キー入力
 	/// 左右や上下等同時に押したときにも対応
 	/// </summary>
