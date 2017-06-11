@@ -31,7 +31,6 @@ public class GameTictactoeEditor : Editor
 		EditorGUILayout.LabelField("GameTictactoe");
 		EditorGUILayout.Space();
 
-		EditorGUI.BeginDisabledGroup(isGameOver);
 		EditorGUILayout.BeginVertical();
 		for (int i = 0; i < CELL_COUNT; i++)
 		{
@@ -40,7 +39,7 @@ public class GameTictactoeEditor : Editor
 			{
 				var no = i * CELL_COUNT + j;
 
-				EditorGUI.BeginDisabledGroup(cell[no] != (int)Mark.None);
+				EditorGUI.BeginDisabledGroup(cell[no] != (int)Mark.None ||isGameOver);
 				if (GUILayout.Button(GetMarkStrint(cell[no])))
 				{
 					if (cell[no] != 0)
@@ -56,11 +55,15 @@ public class GameTictactoeEditor : Editor
 			EditorGUILayout.EndHorizontal();
 		}
 		EditorGUILayout.EndVertical();
-		EditorGUI.EndDisabledGroup();
+
+		DrawInitButton();
+
 	}
 
 	void DrawInitButton()
 	{
+		if (!isGameOver)
+			return;
 		if (GUILayout.Button("Init"))
 			Init();
 	}
@@ -111,6 +114,7 @@ public class GameTictactoeEditor : Editor
 		cell = new int[CELL_COUNT * CELL_COUNT];
 		for (int i = 0; i < cell.Length; i++)
 			cell[i] = 0;
+		isGameOver = false;
 		isInit = true;
 	}
 
