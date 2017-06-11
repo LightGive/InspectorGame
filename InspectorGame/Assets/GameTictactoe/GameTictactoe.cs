@@ -15,6 +15,13 @@ public class GameTictactoeEditor : Editor
 	private bool isInit = false;
 	private bool isGameOver = false;
 
+	private enum Mark
+	{
+		None = 0,
+		Tic  = 1,
+		Tac  = 2
+	}
+
 	public override void OnInspectorGUI()
 	{
 		if (!isInit)
@@ -32,6 +39,8 @@ public class GameTictactoeEditor : Editor
 			for (int j = 0; j < CELL_COUNT; j++)
 			{
 				var no = i * CELL_COUNT + j;
+
+				EditorGUI.BeginDisabledGroup(cell[no] != (int)Mark.None);
 				if (GUILayout.Button(GetMarkStrint(cell[no])))
 				{
 					if (cell[no] != 0)
@@ -42,6 +51,7 @@ public class GameTictactoeEditor : Editor
 					ChangeTurn();
 					Repaint();
 				}
+				EditorGUI.EndDisabledGroup();
 			}
 			EditorGUILayout.EndHorizontal();
 		}
