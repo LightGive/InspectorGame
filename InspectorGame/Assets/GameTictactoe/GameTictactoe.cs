@@ -69,14 +69,19 @@ public class GameTictactoeEditor : Editor
 
 	void DrawSelectButton()
 	{
+		EditorGUILayout.Space();
+		EditorGUILayout.LabelField("Player Select");
+		EditorGUILayout.Space();
 		if (GUILayout.Button("Player VS Player"))
 			Init();
+		EditorGUI.BeginDisabledGroup(true);
 		if (GUILayout.Button("Player VS CPU(Easy)"))
 			Init();
 		if (GUILayout.Button("Player VS CPU(Normal)"))
 			Init();
 		if (GUILayout.Button("Player VS CPU(Hard)"))
 			Init();
+		EditorGUI.EndDisabledGroup();
 	}
 
 	void DrawInitButton()
