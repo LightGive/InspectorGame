@@ -33,7 +33,10 @@ public class GameTictactoeEditor : Editor
 	public override void OnInspectorGUI()
 	{
 		if (!isInit)
+		{
 			DrawSelectButton();
+			return;
+		}
 
 		EditorGUILayout.BeginVertical();
 		for (int i = 0; i < CELL_COUNT; i++)
