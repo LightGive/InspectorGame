@@ -558,17 +558,14 @@ public class ShootingEditor : Editor
 	void InputKey()
 	{
 		Event e = Event.current;
+
 		if (e.type == EventType.keyDown)
 		{
 			//移動キーフラグ
-			if (e.keyCode == KeyCode.D)
-				keyFlag |= KeyFlag.Key_Right;
-			if (e.keyCode == KeyCode.A)
-				keyFlag |= KeyFlag.Key_Left;
-			if (e.keyCode == KeyCode.W)
-				keyFlag |= KeyFlag.Key_Up;
-			if (e.keyCode == KeyCode.S)
-				keyFlag |= KeyFlag.Key_Down;
+			if (e.keyCode == KeyCode.D) { keyFlag |= KeyFlag.Key_Right; }
+			if (e.keyCode == KeyCode.A) { keyFlag |= KeyFlag.Key_Left; }
+			if (e.keyCode == KeyCode.W) { keyFlag |= KeyFlag.Key_Up; }
+			if (e.keyCode == KeyCode.S) { keyFlag |= KeyFlag.Key_Down; }
 
 			//左右同時押しの時
 			if ((keyFlag & (KeyFlag.Key_Right | KeyFlag.Key_Left)) == (KeyFlag.Key_Right | KeyFlag.Key_Left))
@@ -603,14 +600,10 @@ public class ShootingEditor : Editor
 		else if (e.type == EventType.keyUp)
 		{
 			//フラグを削除する
-			if (e.keyCode == KeyCode.D)
-				keyFlag = keyFlag & ~KeyFlag.Key_Right;
-			if (e.keyCode == KeyCode.A)
-				keyFlag = keyFlag & ~KeyFlag.Key_Left;
-			if (e.keyCode == KeyCode.W)
-				keyFlag = keyFlag & ~KeyFlag.Key_Up;
-			if (e.keyCode == KeyCode.S)
-				keyFlag = keyFlag & ~KeyFlag.Key_Down;
+			if (e.keyCode == KeyCode.D) { keyFlag = keyFlag & ~KeyFlag.Key_Right; }
+			if (e.keyCode == KeyCode.A) { keyFlag = keyFlag & ~KeyFlag.Key_Left; }
+			if (e.keyCode == KeyCode.W) { keyFlag = keyFlag & ~KeyFlag.Key_Up; }
+			if (e.keyCode == KeyCode.S) { keyFlag = keyFlag & ~KeyFlag.Key_Down; }
 
 			//離した逆側のキーが押されていた時
 			if ((keyFlag & KeyFlag.Key_Right) == KeyFlag.Key_Right)
@@ -629,6 +622,7 @@ public class ShootingEditor : Editor
 			else
 				playerVec.y = 0;
 
+			//スペースキーが押されているとき
 			if (e.keyCode == KeyCode.Space)
 			{
 				keyFlag = keyFlag & ~KeyFlag.Key_Space;
