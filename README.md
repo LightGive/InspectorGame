@@ -12,6 +12,7 @@
 ・テトリス  
 ![Alt text](/InspectorGame/ExampleImage/Example_Tetoris.gif)  
   
+・丸バツゲーム
 
 
 作成中 
