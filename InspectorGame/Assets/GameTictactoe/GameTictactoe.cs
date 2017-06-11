@@ -7,11 +7,10 @@ using UnityEditor;
 public class GameTictactoe : MonoBehaviour {}
 #if UNITY_EDITOR
 [CustomEditor(typeof(GameTictactoe))]
-public class GameTictactoeEditor: Editor
+public class GameTictactoeEditor : Editor
 {
 	private const int CELL_COUNT = 3;
-	private string[] markStr = new string[3];
-	private int[] mass = new int[CELL_COUNT * CELL_COUNT];
+	private int[] cell = new int[CELL_COUNT * CELL_COUNT];
 	private int nowTurn = 1;
 	private bool isInit = false;
 	private bool isGameOver = false;
@@ -22,9 +21,10 @@ public class GameTictactoeEditor: Editor
 			Init();
 
 		EditorGUILayout.Space();
-		EditorGUILayout.LabelField("MarubatuEditor");
+		EditorGUILayout.LabelField("GameTictactoe");
 		EditorGUILayout.Space();
 
+		EditorGUI.BeginDisabledGroup(isGameOver);
 		EditorGUILayout.BeginVertical();
 		for (int i = 0; i < CELL_COUNT; i++)
 		{
@@ -32,13 +32,12 @@ public class GameTictactoeEditor: Editor
 			for (int j = 0; j < CELL_COUNT; j++)
 			{
 				var no = i * CELL_COUNT + j;
-				if (GUILayout.Button(markStr[mass[no]]))
+				if (GUILayout.Button(GetMarkStrint(cell[no])))
 				{
-					//もうマスに入っているときは入れれない
-					if (mass[no] != 0)
+					if (cell[no] != 0)
 						return;
 
-					mass[no] = nowTurn;
+					cell[no] = nowTurn;
 					CheckClear(no);
 					ChangeTurn();
 					Repaint();
@@ -47,6 +46,7 @@ public class GameTictactoeEditor: Editor
 			EditorGUILayout.EndHorizontal();
 		}
 		EditorGUILayout.EndVertical();
+		EditorGUI.EndDisabledGroup();
 	}
 
 	void DrawInitButton()
@@ -55,21 +55,17 @@ public class GameTictactoeEditor: Editor
 			Init();
 	}
 
-	/// <summary>
-	/// クリア判定
-	/// </summary>
 	void CheckClear(int x)
 	{
-		//縦横斜めを調べる
-		if ((((mass[0] == mass[1] && mass[1] == mass[2]) && mass[0] != 0) ||
-			 ((mass[3] == mass[4] && mass[4] == mass[5]) && mass[3] != 0) ||
-			 ((mass[6] == mass[7] && mass[7] == mass[8]) && mass[6] != 0) ||
-			 ((mass[0] == mass[3] && mass[3] == mass[6]) && mass[0] != 0) ||
-			 ((mass[1] == mass[4] && mass[4] == mass[7]) && mass[1] != 0) ||
-			 ((mass[2] == mass[5] && mass[5] == mass[8]) && mass[2] != 0) ||
-			 ((mass[0] == mass[4] && mass[4] == mass[8]) && mass[0] != 0) ||
-			 ((mass[2] == mass[4] && mass[4] == mass[6]) && mass[2] != 0)) &&
-			   mass[x] != 0)
+		if ((((cell[0] == cell[1] && cell[1] == cell[2]) && cell[0] != 0) ||
+			 ((cell[3] == cell[4] && cell[4] == cell[5]) && cell[3] != 0) ||
+			 ((cell[6] == cell[7] && cell[7] == cell[8]) && cell[6] != 0) ||
+			 ((cell[0] == cell[3] && cell[3] == cell[6]) && cell[0] != 0) ||
+			 ((cell[1] == cell[4] && cell[4] == cell[7]) && cell[1] != 0) ||
+			 ((cell[2] == cell[5] && cell[5] == cell[8]) && cell[2] != 0) ||
+			 ((cell[0] == cell[4] && cell[4] == cell[8]) && cell[0] != 0) ||
+			 ((cell[2] == cell[4] && cell[4] == cell[6]) && cell[2] != 0)) &&
+			   cell[x] != 0)
 		{
 			isGameOver = true;
 			if (nowTurn == 1)
@@ -78,18 +74,16 @@ public class GameTictactoeEditor: Editor
 				EditorUtility.DisplayDialog("Result", "× Win!!", "OK");
 		}
 
-		//ゲームオーバーじゃないとき
 		if (!isGameOver)
 		{
 			var cnt = 0;
-			for (int i = 0; i < mass.Length; i++)
+			for (int i = 0; i < cell.Length; i++)
 			{
-				if (mass[i] != 0)
+				if (cell[i] != 0)
 					cnt++;
 			}
 
-			//マスが全部埋まってるとき
-			if (cnt == mass.Length)
+			if (cnt == cell.Length)
 			{
 				EditorUtility.DisplayDialog("title", "GameEnd", "Retry");
 				Init();
@@ -97,26 +91,28 @@ public class GameTictactoeEditor: Editor
 		}
 	}
 
-	/// <summary>
-	/// ターンを変える
-	/// </summary>
 	void ChangeTurn()
 	{
 		nowTurn = (nowTurn == 2) ? 1 : 2;
 	}
 
-	/// <summary>
-	/// 初期化
-	/// </summary>
 	void Init()
 	{
-		for (int i = 0; i < mass.Length; i++)
-			mass[i] = 0;
-
+		cell = new int[CELL_COUNT * CELL_COUNT];
+		for (int i = 0; i < cell.Length; i++)
+			cell[i] = 0;
 		isInit = true;
-		markStr[0] = "";
-		markStr[1] = "○";
-		markStr[2] = "×";
+	}
+
+	private string GetMarkStrint(int _no)
+	{
+		switch (_no)
+		{
+			case 0: return "";
+			case 1: return "●";
+			case 2: return "×";
+			default: return "";
+		}
 	}
 }
 #endif
