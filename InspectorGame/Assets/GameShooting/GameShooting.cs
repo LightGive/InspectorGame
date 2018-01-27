@@ -559,7 +559,7 @@ public class ShootingEditor : Editor
 	{
 		Event e = Event.current;
 
-		if (e.type == EventType.keyDown)
+		if (e.type == EventType.KeyDown)
 		{
 			//移動キーフラグ
 			if (e.keyCode == KeyCode.D) { keyFlag |= KeyFlag.Key_Right; }
@@ -597,7 +597,7 @@ public class ShootingEditor : Editor
 			if (e.keyCode == KeyCode.Space)
 				keyFlag |= KeyFlag.Key_Space;
 		}
-		else if (e.type == EventType.keyUp)
+		else if (e.type == EventType.KeyUp)
 		{
 			//フラグを削除する
 			if (e.keyCode == KeyCode.D) { keyFlag = keyFlag & ~KeyFlag.Key_Right; }
