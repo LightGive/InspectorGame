@@ -26,7 +26,8 @@ public class Game2048 : MonoBehaviour
 public class Game1024Editor : Editor
 {
 	public const string SAVE_SCORE_KEY = "SAVE_SCORE_KEY";
-	public const string SAVE_MASS_KEY = "SAVE_MASS_KEY";
+	public const string SAVE_CELL_KEY = "SAVE_MASS_KEY";
+    public const char SPLIT_CHAR = ',';
     public const int MAX_MASS = 10;
 	public const int MIN_MASS = 2;
 	private const int MAX_NUM = 524288;
@@ -35,7 +36,7 @@ public class Game1024Editor : Editor
 	private const int BUTTON_HEIGHT = 20;
 	private const int MASS_HEIGHT = 20;
 	private const float TOW_PERCENET = 0.75f;
-	private int[,] mass;
+	private int[,] cell;
 
 	public int Score
 	{
@@ -103,8 +104,8 @@ public class Game1024Editor : Editor
 			EditorGUILayout.BeginHorizontal();
 			for (int j = 0; j < colum; j++)
 			{
-				var num = mass[i, j];
-				var str = num == 0 ? "" : mass[i, j].ToString("0");
+				var num = cell[i, j];
+				var str = num == 0 ? "" : cell[i, j].ToString("0");
 				var fontStyle = new GUIStyle(GUI.skin.box);
 				fontStyle.fontStyle = (num == 0) ? FontStyle.Normal : FontStyle.Bold;
 				GUI.color = GetNumColor(num);
@@ -149,12 +150,21 @@ public class Game1024Editor : Editor
 		}
 		if (GUILayout.Button("Save", GUILayout.Height(BUTTON_HEIGHT)))
 		{
-			SaveMass();
+            SaveCell();
 		}
-		if (GUILayout.Button("Load", GUILayout.Height(BUTTON_HEIGHT)))
-		{
-			mass = LoadMass();
-		}
+        if (GUILayout.Button("Load", GUILayout.Height(BUTTON_HEIGHT)))
+        {
+            int[,] loadCell = LoadCell();
+
+            if (loadCell.GetLength(0) != 0)
+            {
+                cell = loadCell;
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("TItle", "There is no data to load.", "OK");
+            }
+        }
 		if (GUILayout.Button("Reset", GUILayout.Height(BUTTON_HEIGHT)))
 		{
 			Reset(row, colum);
@@ -167,50 +177,62 @@ public class Game1024Editor : Editor
 	{
 		Score = 0;
 		highScore = EditorPrefs.GetInt(SAVE_SCORE_KEY + _row.ToString("00") + _colum.ToString("00"), 0);
-		mass = new int[_row, _colum];
+		cell = new int[_row, _colum];
 		for (int i = 0; i < row; i++)
 		{
 			for (int j = 0; j < colum; j++)
 			{
-				mass[i, j] = 0;
+				cell[i, j] = 0;
 			}
 		}
 		Pop();
 	}
 
-	void SaveMass()
+	void SaveCell()
 	{
 		var saveStr = "";
 
 		saveStr += row.ToString("000000");
+        saveStr += SPLIT_CHAR;
 		saveStr += colum.ToString("000000");
-		for (int i = 0; i < row; i++)
-		{
-			for (int j = 0; j < colum; j++)
-			{
-				saveStr += mass[i, j].ToString("000000");
-				mass[i, j] = 0;
-			}
-		}
-		Debug.Log(saveStr);
-		EditorPrefs.SetString(SAVE_MASS_KEY, saveStr);
+        saveStr += SPLIT_CHAR;
+
+        for (int i = 0; i < row; i++)
+        {
+            for (int j = 0; j < colum; j++)
+            {
+                saveStr += cell[i, j].ToString("000000");
+                saveStr += SPLIT_CHAR;
+            }
+        }
+
+        EditorPrefs.SetString(SAVE_CELL_KEY, saveStr);
 	}
 
-	int[,] LoadMass()
+    int[,] LoadCell()
 	{
-		var loadStr = EditorPrefs.GetString(SAVE_MASS_KEY, "");
-		int row = int.Parse(loadStr.Substring(0, DIGIT_NUM));
-		int colum = int.Parse(loadStr.Substring(DIGIT_NUM, DIGIT_NUM));
+        string loadStr = EditorPrefs.GetString(SAVE_CELL_KEY, "");
+        if (string.IsNullOrEmpty(loadStr))
+            return null;
+                
+        string[] loadSingleCell = loadStr.Split(SPLIT_CHAR);
 
-		int[,] loadMass = new int[row, colum];
-		for(int i = DIGIT_NUM * 2; i < (DIGIT_NUM * 2) + row; i += DIGIT_NUM)
-		{
-			for (int j = DIGIT_NUM * 2; j < (DIGIT_NUM * 2) + colum; j  += DIGIT_NUM)
-			{
-				//loadMass[] loadStr
-			}
-		}
-		return loadMass;
+
+        Debug.Log(loadSingleCell[0]);
+        int r = int.Parse(loadSingleCell[0]);
+        int c = int.Parse(loadSingleCell[1]);
+
+        int[,] loadCell = new int[row, colum];
+        for (int i = 0; i < r ; i++)
+        {
+            for (int j = 0; j < c; j++)
+            {
+                var str = loadSingleCell[((i * r) + j) + 2];
+                Debug.Log("Load:" + str);
+                loadCell[i, j] = int.Parse(str);
+            }
+        }
+		return loadCell;
 	}
 
 	Color GetNumColor(int _num)
@@ -239,7 +261,7 @@ public class Game1024Editor : Editor
 		{
 			for (int j = 0; j < colum; j++)
 			{
-				if (mass[i, j] == 0)
+				if (cell[i, j] == 0)
 					zeroIdxList.Add(new Mass(i, j));
 			}
 		}
@@ -251,14 +273,17 @@ public class Game1024Editor : Editor
 
 		var ran = Random.Range(0, zeroIdxList.Count);
 		var num = Random.value > TOW_PERCENET ? 4 : 2;
-		mass[zeroIdxList[ran].x, zeroIdxList[ran].y] = num;
+		cell[zeroIdxList[ran].x, zeroIdxList[ran].y] = num;
 
 
 		if (IsCanNotMove(1, 0) && IsCanNotMove(0, 1) && IsCanNotMove(-1, 0) && IsCanNotMove(0, -1))
 		{
 			OnInspectorGUI();
+
 			GameOver();
 		}
+
+        SaveCell();
 	}
 
 	void GameOver()
@@ -269,7 +294,7 @@ public class Game1024Editor : Editor
 			congraturation+
 			"\n" +
 			"HighScore : " + highScore.ToString("000000") + "\n" +
-			"Score　　　: " + Score.ToString("000000") + "\n" + "\n" +
+			"Score       : " + Score.ToString("000000") + "\n" + "\n" +
 			"Continue?", "Yes", "No");
 		if (isContinue)
 		{
@@ -294,7 +319,7 @@ public class Game1024Editor : Editor
 			{
 				if ((j - _jDir) < 0 || (j - _jDir) >= colum || (i - _iDir) < 0 || (i - _iDir) >= row)
 					continue;
-				if ((mass[i - _iDir, j - _jDir] == 0 && mass[i, j] != 0) || (mass[i - _iDir, j - _jDir] == mass[i, j] && mass[i, j] != 0))
+				if ((cell[i - _iDir, j - _jDir] == 0 && cell[i, j] != 0) || (cell[i - _iDir, j - _jDir] == cell[i, j] && cell[i, j] != 0))
 				{
 					return false;
 				}
@@ -322,13 +347,13 @@ public class Game1024Editor : Editor
 				{
 					if ((j - _jDir) < 0 || (j - _jDir) >= colum || (i - _iDir) < 0 || (i - _iDir) >= row)
 						continue;
-					if ((mass[i - _iDir, j - _jDir] == 0 && mass[i, j] != 0 && k == 0) ||
-						(mass[i - _iDir, j - _jDir] == mass[i, j] && mass[i, j] != 0 && k == 1))
+					if ((cell[i - _iDir, j - _jDir] == 0 && cell[i, j] != 0 && k == 0) ||
+						(cell[i - _iDir, j - _jDir] == cell[i, j] && cell[i, j] != 0 && k == 1))
 					{
 						if (k == 1)
 						{
-							var addScore = (mass[i, j] == MAX_NUM) ? mass[i, j] : mass[i, j] * 2;
-							mass[i, j] = addScore;
+							var addScore = (cell[i, j] == MAX_NUM) ? cell[i, j] : cell[i, j] * 2;
+							cell[i, j] = addScore;
 							Score += addScore;
 						}
 
@@ -337,9 +362,9 @@ public class Game1024Editor : Editor
 						while ((_jDir > 0 && jCnt < colum) || (_jDir < 0 && jCnt >= 0) || (_iDir > 0 && iCnt < row) || (_iDir < 0 && iCnt >= 0))
 						{
 							if (_jDir != 0)
-								mass[i, jCnt - _jDir] = mass[i, jCnt];
+								cell[i, jCnt - _jDir] = cell[i, jCnt];
 							else
-								mass[iCnt - _iDir, j] = mass[iCnt, j];
+								cell[iCnt - _iDir, j] = cell[iCnt, j];
 							jCnt += _jDir;
 							iCnt += _iDir;
 						}
@@ -351,7 +376,7 @@ public class Game1024Editor : Editor
 						if (_jDir != 0)
 							jj = (_jDir > 0) ? colum - 1 : 0;
 
-						mass[ii, jj] = 0;
+						cell[ii, jj] = 0;
 						j -= k == 1 ? _jDir : _jDir * 2;
 						i -= k == 1 ? _iDir : _iDir * 2;
 					}
