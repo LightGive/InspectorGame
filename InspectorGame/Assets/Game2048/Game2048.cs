@@ -11,9 +11,9 @@ public class Game2048 : MonoBehaviour
 	[ContextMenu("Delete SaveData")]
 	void DeleteSaveData()
 	{
-		for (int i = Game1024Editor.MIN_MASS; i < Game1024Editor.MAX_MASS; i++)
+        for (int i = Game1024Editor.MIN_CELL; i < Game1024Editor.MAX_CELL; i++)
 		{
-			for (int j = Game1024Editor.MIN_MASS; j < Game1024Editor.MAX_MASS; j++)
+			for (int j = Game1024Editor.MIN_CELL; j < Game1024Editor.MAX_CELL; j++)
 			{
 				EditorPrefs.DeleteKey(Game1024Editor.SAVE_SCORE_KEY + i.ToString("00") + j.ToString("00"));
 			}
@@ -26,10 +26,13 @@ public class Game2048 : MonoBehaviour
 public class Game1024Editor : Editor
 {
 	public const string SAVE_SCORE_KEY = "SAVE_SCORE_KEY";
-	public const string SAVE_CELL_KEY = "SAVE_MASS_KEY";
+	public const string SAVE_CELL_KEY = "SAVE_CELL_KEY";
+    public const string SAVE_ISSTART_KEY = "SAVE_ISSTART_KEY";
+
     public const char SPLIT_CHAR = ',';
-    public const int MAX_MASS = 10;
-	public const int MIN_MASS = 2;
+    public const int MAX_CELL = 10;
+	public const int MIN_CELL = 2;
+
 	private const int MAX_NUM = 524288;
 	private const int DIGIT_NUM = 6;
     private const int DEFAULT_WIDTH_NUM = 4;
@@ -52,29 +55,47 @@ public class Game1024Editor : Editor
 		}
 	}
 
+    private bool IsStart
+    {
+        get
+        {
+            var str = EditorPrefs.GetString(SAVE_ISSTART_KEY);
+            return (str == "true");
+        }
+        set
+        {
+            EditorPrefs.SetString(value.ToString());
+        }
+    }
+
 	private int row = DEFAULT_WIDTH_NUM;
 	private int colum = DEFAULT_WIDTH_NUM;
 	private int score;
 	private int highScore;
 	private bool isStart;
 
-	public class Mass
+	public class Cell
 	{
 		public int x;
 		public int y;
-		public Mass(int _x,int _y)
+		public Cell(int _x,int _y)
 		{
 			x = _x;
 			y = _y;
 		}
 	}
 
-	public override void OnInspectorGUI()
+    void OnEnable()
+    {
+        LoadCell();
+    }
+
+    public override void OnInspectorGUI()
 	{
 		if (!isStart)
 		{
-			row = (int)EditorGUILayout.IntSlider("Row", row, MIN_MASS, MAX_MASS);
-			colum = (int)EditorGUILayout.IntSlider("Colum", colum, MIN_MASS, MAX_MASS);
+			row = (int)EditorGUILayout.IntSlider("Row", row, MIN_CELL, MAX_CELL);
+			colum = (int)EditorGUILayout.IntSlider("Colum", colum, MIN_CELL, MAX_CELL);
 			if (GUILayout.Button("Start"))
 			{
 				isStart = true;
@@ -144,14 +165,11 @@ public class Game1024Editor : Editor
 		EditorGUILayout.Space();
 		
 		EditorGUILayout.BeginHorizontal();
-		if (GUILayout.Button("Quit", GUILayout.Height(BUTTON_HEIGHT)))
+		if (GUILayout.Button("Title", GUILayout.Height(BUTTON_HEIGHT)))
 		{
-			DestroyImmediate(target);
-		}
-		if (GUILayout.Button("Save", GUILayout.Height(BUTTON_HEIGHT)))
-		{
-            SaveCell();
-		}
+            OnTitleButtonDown();
+        }
+		
         if (GUILayout.Button("Load", GUILayout.Height(BUTTON_HEIGHT)))
         {
             int[,] loadCell = LoadCell();
@@ -172,6 +190,12 @@ public class Game1024Editor : Editor
 		EditorGUILayout.EndHorizontal();
 
 	}
+
+    void OnTitleButtonDown()
+    {
+        isStart = false;
+        OnInspectorGUI();
+    }
 
 	void Reset(int _row, int _colum)
 	{
@@ -210,11 +234,11 @@ public class Game1024Editor : Editor
 	}
 
     int[,] LoadCell()
-	{
+    {
         string loadStr = EditorPrefs.GetString(SAVE_CELL_KEY, "");
         if (string.IsNullOrEmpty(loadStr))
             return null;
-                
+
         string[] loadSingleCell = loadStr.Split(SPLIT_CHAR);
 
 
@@ -223,7 +247,7 @@ public class Game1024Editor : Editor
         int c = int.Parse(loadSingleCell[1]);
 
         int[,] loadCell = new int[row, colum];
-        for (int i = 0; i < r ; i++)
+        for (int i = 0; i < r; i++)
         {
             for (int j = 0; j < c; j++)
             {
@@ -232,8 +256,9 @@ public class Game1024Editor : Editor
                 loadCell[i, j] = int.Parse(str);
             }
         }
-		return loadCell;
-	}
+        return loadCell;
+    }
+
 
 	Color GetNumColor(int _num)
 	{
@@ -247,22 +272,21 @@ public class Game1024Editor : Editor
 			case 64: return new Color32(255, 99, 71, 255);
 			case 128: return new Color32(255, 69, 0, 255);
 			case 256: return new Color32(255, 0, 0, 255);
-			case 512: return new Color32(255, 20, 147, 255);
+            case 512: return new Color32(255, 20, 147, 255);
 		}
-
-		return Color.white;
-	}
+        return Color.white;
+    }
 
 	void Pop()
 	{
-		List<Mass> zeroIdxList = new List<Mass>();
+		List<Cell> zeroIdxList = new List<Cell>();
 
 		for (int i = 0; i < row; i++)
 		{
 			for (int j = 0; j < colum; j++)
 			{
 				if (cell[i, j] == 0)
-					zeroIdxList.Add(new Mass(i, j));
+					zeroIdxList.Add(new Cell(i, j));
 			}
 		}
 
@@ -279,11 +303,13 @@ public class Game1024Editor : Editor
 		if (IsCanNotMove(1, 0) && IsCanNotMove(0, 1) && IsCanNotMove(-1, 0) && IsCanNotMove(0, -1))
 		{
 			OnInspectorGUI();
-
 			GameOver();
-		}
+        }
+        else
+        {
+            SaveCell();
+        }
 
-        SaveCell();
 	}
 
 	void GameOver()
@@ -302,7 +328,7 @@ public class Game1024Editor : Editor
 		}
 		else
 		{
-			DestroyImmediate(target);
+            isStart = false;
 		}
 	}
 
