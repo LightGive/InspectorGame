@@ -11,11 +11,13 @@ public class Game2048 : MonoBehaviour
 	[ContextMenu("Delete SaveData")]
 	void DeleteSaveData()
 	{
-        for (int i = Game1024Editor.MIN_CELL; i < Game1024Editor.MAX_CELL; i++)
+        EditorPrefs.DeleteKey(Game2048Editor.SAVE_ISSTART_KEY);
+        EditorPrefs.DeleteKey(Game2048Editor.SAVE_CELL_KEY);
+        for (int i = Game2048Editor.MIN_CELL; i < Game2048Editor.MAX_CELL; i++)
 		{
-			for (int j = Game1024Editor.MIN_CELL; j < Game1024Editor.MAX_CELL; j++)
+			for (int j = Game2048Editor.MIN_CELL; j < Game2048Editor.MAX_CELL; j++)
 			{
-				EditorPrefs.DeleteKey(Game1024Editor.SAVE_SCORE_KEY + i.ToString("00") + j.ToString("00"));
+				EditorPrefs.DeleteKey(Game2048Editor.SAVE_SCORE_KEY + i.ToString("00") + j.ToString("00"));
 			}
 		}
 	}
@@ -23,15 +25,15 @@ public class Game2048 : MonoBehaviour
 
 #if UNITY_EDITOR
 [CustomEditor(typeof(Game2048))]
-public class Game1024Editor : Editor
+public class Game2048Editor : Editor
 {
-	public const string SAVE_SCORE_KEY = "SAVE_SCORE_KEY";
-	public const string SAVE_CELL_KEY = "SAVE_CELL_KEY";
+    public const string SAVE_SCORE_KEY = "SAVE_SCORE_KEY";
+    public const string SAVE_CELL_KEY = "SAVE_CELL_KEY";
     public const string SAVE_ISSTART_KEY = "SAVE_ISSTART_KEY";
-
-    public const char SPLIT_CHAR = ',';
-    public const int MAX_CELL = 10;
-	public const int MIN_CELL = 2;
+    private const string SAVE_FORMAT = "000000";
+    private const char SPLIT_CHAR = ',';
+    public const int MAX_CELL = 8;
+    public const int MIN_CELL = 2;
 
 	private const int MAX_NUM = 524288;
 	private const int DIGIT_NUM = 6;
@@ -41,17 +43,27 @@ public class Game1024Editor : Editor
 	private const float TOW_PERCENET = 0.75f;
 	private int[,] cell;
 
+    public int HighScore
+    {
+        get 
+        {
+            return EditorPrefs.GetInt(SAVE_SCORE_KEY + row.ToString("00") + colum.ToString("00"), 0);
+        }
+        set
+        {
+            if (value > EditorPrefs.GetInt(SAVE_SCORE_KEY + row.ToString("00") + colum.ToString("00"), 0))
+                EditorPrefs.SetInt(SAVE_SCORE_KEY + row.ToString("00") + colum.ToString("00"), value);
+        }
+
+    }
+
 	public int Score
 	{
 		get { return score; }
 		set
 		{
-			if (value > highScore)
-			{
-				highScore = value;
-				EditorPrefs.SetInt(SAVE_SCORE_KEY + row.ToString("00") + colum.ToString("00"), highScore);
-			}
 			score = value;
+            HighScore = score;
 		}
 	}
 
@@ -60,11 +72,11 @@ public class Game1024Editor : Editor
         get
         {
             var str = EditorPrefs.GetString(SAVE_ISSTART_KEY);
-            return (str == "true");
+            return (str == "True");
         }
         set
         {
-            EditorPrefs.SetString(value.ToString());
+            EditorPrefs.SetString(SAVE_ISSTART_KEY, value.ToString());
         }
     }
 
@@ -72,7 +84,8 @@ public class Game1024Editor : Editor
 	private int colum = DEFAULT_WIDTH_NUM;
 	private int score;
 	private int highScore;
-	private bool isStart;
+    private bool isGameStart;
+    private bool isGameOver = false;
 
 	public class Cell
 	{
@@ -87,34 +100,36 @@ public class Game1024Editor : Editor
 
     void OnEnable()
     {
-        LoadCell();
+        isGameStart = IsStart;
+        if (isGameStart)
+        {
+            cell = LoadCell();
+        }
     }
 
     public override void OnInspectorGUI()
 	{
-		if (!isStart)
-		{
-			row = (int)EditorGUILayout.IntSlider("Row", row, MIN_CELL, MAX_CELL);
-			colum = (int)EditorGUILayout.IntSlider("Colum", colum, MIN_CELL, MAX_CELL);
-			if (GUILayout.Button("Start"))
-			{
-				isStart = true;
-				Reset(row, colum);
-			}
-			return;
-		}
-		
+        if (!isGameStart)
+        {
+            GameStartDisplay();
+            return;
+        } 
+        if(isGameOver)
+        {
+            GameOverDisplay();
+            return;
+        }
+
 		var windowWidth = EditorGUIUtility.currentViewWidth;
-
-
 		EditorGUILayout.Space();
 		var labelStyle = GUI.skin.GetStyle("Label");
 		labelStyle.alignment = TextAnchor.MiddleLeft;
 		labelStyle.fontStyle = FontStyle.Bold;
 
 		EditorGUILayout.BeginHorizontal();
-		EditorGUILayout.LabelField("Score" + "\n" + Score.ToString("000000"), labelStyle, GUILayout.Width(windowWidth / 2), GUILayout.Height(40));
-		EditorGUILayout.LabelField("HighScore" + "\n" + highScore.ToString("000000"), labelStyle, GUILayout.Width(windowWidth/2), GUILayout.Height(40));
+        Score = CalcScore();
+		EditorGUILayout.LabelField("Score" + "\n" + Score.ToString(SAVE_FORMAT), labelStyle, GUILayout.Width(windowWidth / 2), GUILayout.Height(40));
+        EditorGUILayout.LabelField("HighScore" + "\n" + HighScore.ToString(SAVE_FORMAT), labelStyle, GUILayout.Width(windowWidth/2), GUILayout.Height(40));
 		EditorGUILayout.EndHorizontal();
 		for (int i = 0; i < row; i++)
 		{
@@ -169,38 +184,74 @@ public class Game1024Editor : Editor
 		{
             OnTitleButtonDown();
         }
-		
-        if (GUILayout.Button("Load", GUILayout.Height(BUTTON_HEIGHT)))
-        {
-            int[,] loadCell = LoadCell();
-
-            if (loadCell.GetLength(0) != 0)
-            {
-                cell = loadCell;
-            }
-            else
-            {
-                EditorUtility.DisplayDialog("TItle", "There is no data to load.", "OK");
-            }
-        }
 		if (GUILayout.Button("Reset", GUILayout.Height(BUTTON_HEIGHT)))
 		{
-			Reset(row, colum);
+            Reset(row, colum);
 		}
 		EditorGUILayout.EndHorizontal();
-
 	}
+
+    void GameStartDisplay()
+    {
+        var labelStyle = GUI.skin.GetStyle("Label");
+        labelStyle.alignment = TextAnchor.MiddleLeft;
+        labelStyle.fontStyle = FontStyle.Bold;
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Game Setting", labelStyle);
+        row = (int)EditorGUILayout.IntSlider("Row", row, MIN_CELL, MAX_CELL);
+        colum = (int)EditorGUILayout.IntSlider("Colum", colum, MIN_CELL, MAX_CELL);
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("HighScore", labelStyle);
+        EditorGUILayout.LabelField(HighScore.ToString(SAVE_FORMAT));
+        EditorGUILayout.Space();
+        if (GUILayout.Button("Start"))
+        {
+            OnStartButtonDown();
+        }
+    }
+
+    void GameOverDisplay()
+    {
+        var labelStyle = GUI.skin.GetStyle("Label");
+        labelStyle.alignment = TextAnchor.MiddleCenter;
+        labelStyle.fontStyle = FontStyle.Bold;
+        EditorGUILayout.LabelField(
+            "Game Over" + "\n" + "\n" +
+            "Youre Score : " + Score.ToString(SAVE_FORMAT) + "\n" +
+            "High Score : " + HighScore.ToString(SAVE_FORMAT) + "\n",
+            labelStyle, GUILayout.Height(80));
+
+        EditorGUILayout.BeginHorizontal();
+        if(GUILayout.Button("Retry"))
+        {
+            Reset(row, colum);
+        }
+        if(GUILayout.Button("Title"))
+        {
+            IsStart = false;
+            isGameStart = false;
+        }
+        EditorGUILayout.EndHorizontal();
+    }
+
+    void OnStartButtonDown()
+    {
+        isGameStart = true;
+        IsStart = true;
+        Reset(row, colum);
+    }
 
     void OnTitleButtonDown()
     {
-        isStart = false;
+        isGameStart = false;
+        IsStart = false;
         OnInspectorGUI();
     }
 
 	void Reset(int _row, int _colum)
 	{
+        isGameOver = false;
 		Score = 0;
-		highScore = EditorPrefs.GetInt(SAVE_SCORE_KEY + _row.ToString("00") + _colum.ToString("00"), 0);
 		cell = new int[_row, _colum];
 		for (int i = 0; i < row; i++)
 		{
@@ -214,22 +265,15 @@ public class Game1024Editor : Editor
 
 	void SaveCell()
 	{
-		var saveStr = "";
-
-		saveStr += row.ToString("000000");
-        saveStr += SPLIT_CHAR;
-		saveStr += colum.ToString("000000");
-        saveStr += SPLIT_CHAR;
-
+        string saveStr = row.ToString(SAVE_FORMAT) + SPLIT_CHAR + colum.ToString(SAVE_FORMAT) + SPLIT_CHAR;
         for (int i = 0; i < row; i++)
         {
             for (int j = 0; j < colum; j++)
             {
-                saveStr += cell[i, j].ToString("000000");
+                saveStr += cell[i, j].ToString(SAVE_FORMAT);
                 saveStr += SPLIT_CHAR;
             }
         }
-
         EditorPrefs.SetString(SAVE_CELL_KEY, saveStr);
 	}
 
@@ -240,19 +284,18 @@ public class Game1024Editor : Editor
             return null;
 
         string[] loadSingleCell = loadStr.Split(SPLIT_CHAR);
-
-
-        Debug.Log(loadSingleCell[0]);
         int r = int.Parse(loadSingleCell[0]);
         int c = int.Parse(loadSingleCell[1]);
+        int[,] loadCell = new int[r, c];
 
-        int[,] loadCell = new int[row, colum];
+        row = r;
+        colum = c;
+
         for (int i = 0; i < r; i++)
         {
             for (int j = 0; j < c; j++)
             {
-                var str = loadSingleCell[((i * r) + j) + 2];
-                Debug.Log("Load:" + str);
+                var str = loadSingleCell[((i * c) + j) + 2];
                 loadCell[i, j] = int.Parse(str);
             }
         }
@@ -264,6 +307,7 @@ public class Game1024Editor : Editor
 	{
 		switch(_num)
 		{
+            case 0: return new Color32(255, 255, 255, 255);
 			case 2: return new Color32(255, 215, 0 ,255);
 			case 4: return new Color32(255, 165, 0, 255);
 			case 8: return new Color32(244, 164, 96, 255);
@@ -297,63 +341,29 @@ public class Game1024Editor : Editor
 
 		var ran = Random.Range(0, zeroIdxList.Count);
 		var num = Random.value > TOW_PERCENET ? 4 : 2;
-		cell[zeroIdxList[ran].x, zeroIdxList[ran].y] = num;
-
-
-		if (IsCanNotMove(1, 0) && IsCanNotMove(0, 1) && IsCanNotMove(-1, 0) && IsCanNotMove(0, -1))
-		{
-			OnInspectorGUI();
-			GameOver();
+        cell[zeroIdxList[ran].x, zeroIdxList[ran].y] = num;
+        if (IsCanNotMove(1, 0) && IsCanNotMove(0, 1) && IsCanNotMove(-1, 0) && IsCanNotMove(0, -1))
+        {
+            isGameOver = true;
         }
         else
         {
             SaveCell();
         }
-
 	}
 
-	void GameOver()
-	{
-		var congraturation = (highScore == Score) ? "Congraturation!!" : "";
-		var isContinue = EditorUtility.DisplayDialog("Game Over",
-			"\n" +
-			congraturation+
-			"\n" +
-			"HighScore : " + highScore.ToString("000000") + "\n" +
-			"Score       : " + Score.ToString("000000") + "\n" + "\n" +
-			"Continue?", "Yes", "No");
-		if (isContinue)
-		{
-			Reset(row, colum);
-		}
-		else
-		{
-            isStart = false;
-		}
-	}
-
-	bool IsCanNotMove(int _iDir = 0, int _jDir = 0)
-	{
-		var iFirst = (_iDir >= 0) ? 0 : row - 1;
-		var jFirst = (_jDir >= 0) ? 0 : colum - 1;
-		var iAdd = (_iDir == 0) ? 1 : _iDir;
-		var jAdd = (_jDir == 0) ? 1 : _jDir;
-
-		for (int i = iFirst; (iAdd > 0) ? (i < row) : (i >= 0); i += iAdd)
-		{
-			for (int j = jFirst; (jAdd > 0) ? (j < colum) : (j >= 0); j += jAdd)
-			{
-				if ((j - _jDir) < 0 || (j - _jDir) >= colum || (i - _iDir) < 0 || (i - _iDir) >= row)
-					continue;
-				if ((cell[i - _iDir, j - _jDir] == 0 && cell[i, j] != 0) || (cell[i - _iDir, j - _jDir] == cell[i, j] && cell[i, j] != 0))
-				{
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
+    int CalcScore()
+    {
+        var sum = 0;
+        for (int i = 0; i < row; i++)
+        {
+            for (int j = 0; j < colum; j++)
+            {
+                sum += cell[i, j];
+            }
+        }
+        return sum;
+    }
 
 	void MoveUnit(int _iDir = 0, int _jDir = 0)
 	{
@@ -380,7 +390,6 @@ public class Game1024Editor : Editor
 						{
 							var addScore = (cell[i, j] == MAX_NUM) ? cell[i, j] : cell[i, j] * 2;
 							cell[i, j] = addScore;
-							Score += addScore;
 						}
 
 						var iCnt = (_iDir == 0) ? 0 : i;
@@ -411,5 +420,27 @@ public class Game1024Editor : Editor
 		}
 		Pop();
 	}
+
+    bool IsCanNotMove(int _iDir = 0, int _jDir = 0)
+    {
+        var iFirst = (_iDir >= 0) ? 0 : row - 1;
+        var jFirst = (_jDir >= 0) ? 0 : colum - 1;
+        var iAdd = (_iDir == 0) ? 1 : _iDir;
+        var jAdd = (_jDir == 0) ? 1 : _jDir;
+
+        for (int i = iFirst; (iAdd > 0) ? (i < row) : (i >= 0); i += iAdd)
+        {
+            for (int j = jFirst; (jAdd > 0) ? (j < colum) : (j >= 0); j += jAdd)
+            {
+                if ((j - _jDir) < 0 || (j - _jDir) >= colum || (i - _iDir) < 0 || (i - _iDir) >= row)
+                    continue;
+                if ((cell[i - _iDir, j - _jDir] == 0 && cell[i, j] != 0) || (cell[i - _iDir, j - _jDir] == cell[i, j] && cell[i, j] != 0))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
 #endif
