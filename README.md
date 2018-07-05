@@ -1,15 +1,12 @@
 # InspectorGame<br>
-インスペクターで遊べるゲームの作品集<br>
-
+インスペクターで遊べるゲームの作品集（ネタ）<br>
 インスペクターにドラッグ＆ドロップすると遊べます<br>
 それぞれのフォルダ毎に分かれています<br>
-  
-作ったものリスト
--------------------------------  
-・2048  
-![Alt text](/InspectorGame/ExampleImage/Example_2048.gif)  
-    
-・テトリス  
+
+## 作ったものリスト  
+### ・2048<br>
+![Alt text](/InspectorGame/ExampleImage/Example_2048.gif)<br>
+### ・テトリス<br>
 ![Alt text](/InspectorGame/ExampleImage/Example_Tetoris.gif)  
   
 ・丸バツゲーム
