@@ -1,0 +1,17 @@
+﻿<Properties StartupConfiguration="{04A9132A-8CC3-87CD-EA6E-6214C1F2632B}|">
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="Unity.Editor" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/GameShooting/GameShooting.cs">
+    <Files>
+      <File FileName="Assets/GameJumper/JumpEditorGame.cs" Line="235" Column="1" />
+      <File FileName="Assets/GameShooting/GameShooting.cs" Line="517" Column="2" />
+      <File FileName="Assets/Game2048/Game2048.cs" Line="293" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.InspectorGame PreferredExecutionTarget="Unity.Editor" />
+  <MultiItemStartupConfigurations />
+</Properties>

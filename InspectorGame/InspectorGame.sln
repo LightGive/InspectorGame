@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio for Mac
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InspectorGame", "InspectorGame.csproj", "{35C75244-F70A-CA84-446F-FE0BE320E759}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InspectorGame", "Assembly-CSharp.csproj", "{04A9132A-8CC3-87CD-EA6E-6214C1F2632B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,10 +9,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{35C75244-F70A-CA84-446F-FE0BE320E759}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{35C75244-F70A-CA84-446F-FE0BE320E759}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{35C75244-F70A-CA84-446F-FE0BE320E759}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{35C75244-F70A-CA84-446F-FE0BE320E759}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04A9132A-8CC3-87CD-EA6E-6214C1F2632B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04A9132A-8CC3-87CD-EA6E-6214C1F2632B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04A9132A-8CC3-87CD-EA6E-6214C1F2632B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04A9132A-8CC3-87CD-EA6E-6214C1F2632B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
