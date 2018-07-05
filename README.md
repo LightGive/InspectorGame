@@ -3,27 +3,20 @@
 インスペクターにドラッグ＆ドロップすると遊べます<br>
 それぞれのフォルダ毎に分かれています<br>
 
-## 作ったものリスト  
+## GameList
 ### ・2048<br>
-![Alt text](/InspectorGame/ExampleImage/Example_2048.gif)<br>
+![Alt text](https://78.media.tumblr.com/67963a4ba7a4a0df7a4bf2fdc5463522/tumblr_pbeab0QAwJ1u4382eo1_400.gif,"2048")<br>
 ### ・テトリス<br>
-![Alt text](/InspectorGame/ExampleImage/Example_Tetoris.gif)  
-  
-・丸バツゲーム
+![Alt text](https://78.media.tumblr.com/b1b346d8aeaef2ac9240ae42dc005180/tumblr_pbeagatDGq1u4382eo1_500.gif,"Tetris")<br>
+### ・丸バツゲーム<br>
 
+## 作成中
+### ・ぷよぷよみたいなもの     
+### ・シューティング  
 
-
-作成中 
--------------------------------   
-・ぷよぷよみたいなもの     
-・シューティング  
- 
-今後作るもの  
-------------------------------- 
-・オセロ  
-・五目並べ  
-
-
+## Future
+## ・オセロ
+## ・五目並べ
   
   
-  作ってほしい要望などあれば教えてください。
+作ってほしい要望などあれば教えてください。
