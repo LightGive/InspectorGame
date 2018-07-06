@@ -163,6 +163,7 @@ public class ShootingEditor : Editor
 		bulletTex[1] = EditorGUIUtility.FindTexture("MoveTool");
 
 		playerPos = new Vector2(0.5f, 1.0f);
+		Debug.Log("Init");
 
 		//自分の弾を生成
 		for (int i = 0; i < 20; i++)
